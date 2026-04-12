@@ -1,0 +1,34 @@
+// Bookigs list
+model Booking {
+  id String @id @default(uuid())
+
+  studentId      String //Fk
+  student        User             @relation("StudentBookings", fields: [studentId], references: [id])
+  tutorId        String //Fk 
+  tutor          Tutor            @relation("TutorBookings", fields: [tutorId], references: [id])
+  slotId         String           @unique //Fk 
+  availableSlots AvailabilitySlot @relation(fields: [slotId], references: [id])
+
+  meetingLink String?
+  status      BookingStatus @default(PENDING)
+
+  price       Decimal  @db.Decimal(10, 2)
+  scheduledAt DateTime
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  review Review?
+
+  @@unique([tutorId, slotId])
+  @@index([studentId])
+  @@index([tutorId, slotId])
+  @@map("bookings")
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}

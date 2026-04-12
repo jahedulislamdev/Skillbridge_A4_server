@@ -1,0 +1,28 @@
+// tutors abailability slot
+model AvailabilitySlot {
+  id      String @id @default(uuid())
+  tutorId String //FK
+  tutor   Tutor  @relation(fields: [tutorId], references: [id])
+
+  dayOfWeek DayOfWeek @default(SUN)
+  startTime DateTime  @db.Time
+  endTime   DateTime  @db.Time
+
+  isBooked  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  booking Booking?
+
+  @@index([tutorId])
+  @@map("availableSlots")
+}
+
+enum DayOfWeek {
+  SUN
+  MON
+  TUE
+  WED
+  THU
+  FRI
+  SAT
+}
