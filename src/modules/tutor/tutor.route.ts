@@ -6,5 +6,6 @@ import { checkRole } from "../../middleware/requireAuth";
 const router = Router();
 
 router.post("/", checkRole(), tutorController.createTutor);
+router.get("/", tutorController.getTutors);
 
 export const tutorRoute = router;

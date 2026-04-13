@@ -1,10 +1,12 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { tutorService } from "./tutor.service";
 
-const createTutor = async (req: Request, res: Response) => {
+const createTutor = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const result = await tutorService.createTutor(req.body);
-        console.log(result);
+        const result = await tutorService.createTutor(
+            req.body,
+            req.user?.id as string,
+        );
 
         res.status(201).json({
             success: true,
@@ -12,15 +14,35 @@ const createTutor = async (req: Request, res: Response) => {
             data: result,
         });
     } catch (err) {
-        res.json({
-            success: false,
-            message: "tutor creation failed",
-            data: null,
+        next(err);
+    }
+};
+const getTutors = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { search, rating } = req.query;
+        console.log(req.params);
+
+        const searchParams =
+            typeof search === "string" && search.trim() !== ""
+                ? search.trim()
+                : undefined;
+        console.log("search value from controller", searchParams);
+
+        const tutorRating = typeof rating === "number" ? rating : undefined;
+        const result = await tutorService.getTutors(searchParams, tutorRating);
+        // console.log(result);
+
+        res.status(201).json({
+            success: true,
+            message: "tutor retrived successfully",
+            data: result,
         });
-        console.log(err);
+    } catch (err) {
+        next(err);
     }
 };
 
 export const tutorController = {
     createTutor,
+    getTutors,
 };
