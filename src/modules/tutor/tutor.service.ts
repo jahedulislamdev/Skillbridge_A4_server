@@ -1,14 +1,22 @@
 import { TutorWhereInput } from "../../../generated/prisma/models";
 import { Tutor } from "../../../generated/prisma/client";
-import { prisma } from "../../lib/prisma";
 import { UserRole } from "../../types/enum/userRole";
+import { prisma } from "../../lib/prisma";
 
 const createTutor = async (
     data: Omit<Tutor, "id" | "createdAt" | "updatedAt">,
     userId: string,
 ) => {
     // console.log({ data, id: userId });
-    return await prisma.tutor.create({ data: { ...data, userId } });
+    const result = await prisma.$transaction(async (tx) => {
+        const tutor = await tx.tutor.create({ data: { ...data, userId } });
+        await tx.user.update({
+            where: { id: tutor.userId },
+            data: { role: UserRole.tutor },
+        });
+        return tutor;
+    });
+    return result;
 };
 const getTutors = async (
     searchValue: string | undefined,
@@ -87,17 +95,16 @@ const getTutors = async (
 };
 const updateTutor = async (
     tutorId: string,
+    currentUserId: string,
     role: UserRole,
     updatedData: Partial<Tutor>,
 ) => {
     const existValidTutor = await prisma.tutor.findUniqueOrThrow({
         where: { id: tutorId },
     });
-    if (!existValidTutor) {
-        throw new Error("Tutor not found");
-    }
-    // admin and tutor himself update their profile
-    if (role !== UserRole.admin && existValidTutor.id !== tutorId) {
+
+    // only admin and tutor himself update his tutor profile
+    if (role !== UserRole.admin && existValidTutor.userId !== currentUserId) {
         throw new Error("You are not allowed to update this profile");
     }
 
@@ -107,9 +114,26 @@ const updateTutor = async (
     });
     return updatedTutor;
 };
-
+const deleteTutor = async (tutorId: string, role: UserRole) => {
+    // only admin and tutor himself delete his tutor profile
+    const existValidTutor = await prisma.tutor.findUnique({
+        where: { id: tutorId },
+    });
+    if (!existValidTutor) {
+        throw new Error("Tutor not found");
+    }
+    if (role !== UserRole.admin && existValidTutor.userId !== tutorId) {
+        throw new Error("You are not allowed to delete this profile");
+    }
+    return await prisma.tutor.delete({
+        where: {
+            id: tutorId,
+        },
+    });
+};
 export const tutorService = {
     createTutor,
     getTutors,
     updateTutor,
+    deleteTutor,
 };
