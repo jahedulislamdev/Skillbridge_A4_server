@@ -11,6 +11,7 @@ router.post(
     tutorController.createTutor,
 );
 router.get("/", tutorController.getTutors);
+router.get("/:tutorId", tutorController.getTutorById);
 router.patch(
     "/:tutorId",
     checkRole(UserRole.admin, UserRole.tutor),

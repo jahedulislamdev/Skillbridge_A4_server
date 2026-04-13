@@ -3,6 +3,7 @@ import { tutorService } from "./tutor.service";
 import buildPagination from "../../helper/paginationHelper";
 import { UserRole } from "../../types/enum/userRole";
 
+//* create tutor
 const createTutor = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const result = await tutorService.createTutor(
@@ -19,6 +20,8 @@ const createTutor = async (req: Request, res: Response, next: NextFunction) => {
         next(err);
     }
 };
+
+//* get tutors
 const getTutors = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { search, rating } = req.query;
@@ -50,6 +53,28 @@ const getTutors = async (req: Request, res: Response, next: NextFunction) => {
         next(err);
     }
 };
+
+//* get tutor by id
+const getTutorById = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+) => {
+    try {
+        const result = await tutorService.getTutorById(
+            req.params.tutorId as string,
+        );
+
+        res.status(200).json({
+            success: true,
+            message: "tutor created successfully",
+            data: result,
+        });
+    } catch (err) {
+        next(err);
+    }
+};
+//* update tutor
 const updateTutor = async (req: Request, res: Response, next: NextFunction) => {
     console.log({
         tutorId: req.params.tutorId,
@@ -75,6 +100,8 @@ const updateTutor = async (req: Request, res: Response, next: NextFunction) => {
         next(err);
     }
 };
+
+//* delete tutor
 const deleteTutor = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const result = await tutorService.deleteTutor(
@@ -98,4 +125,5 @@ export const tutorController = {
     getTutors,
     updateTutor,
     deleteTutor,
+    getTutorById,
 };

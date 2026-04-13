@@ -96,6 +96,18 @@ const getTutors = async (
     };
 };
 
+//* get tutor by id
+const getTutorById = async (tutotId: string) => {
+    const result = await prisma.tutor.findUnique({
+        where: {
+            id: tutotId,
+        },
+    });
+    if (!result) {
+        throw new Error("Tutor not found!");
+    }
+    return result;
+};
 //* update tutor profile
 const updateTutor = async (
     tutorId: string,
@@ -103,9 +115,12 @@ const updateTutor = async (
     role: UserRole,
     updatedData: TutorInput,
 ) => {
-    const existValidTutor = await prisma.tutor.findUniqueOrThrow({
+    const existValidTutor = await prisma.tutor.findUnique({
         where: { id: tutorId },
     });
+    if (!existValidTutor) {
+        throw new Error("Tutor not Found!");
+    }
     // only admin and tutor himself update his tutor profile
     if (role !== UserRole.admin && existValidTutor.userId !== currentUserId) {
         throw new Error("You are not allowed to update this profile");
@@ -149,4 +164,5 @@ export const tutorService = {
     getTutors,
     updateTutor,
     deleteTutor,
+    getTutorById,
 };
