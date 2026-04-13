@@ -5,13 +5,21 @@ import { Router } from "express";
 
 const router = Router();
 
-router.post("/", checkRole(), tutorController.createTutor);
+router.post(
+    "/",
+    checkRole(UserRole.user, UserRole.admin),
+    tutorController.createTutor,
+);
 router.get("/", tutorController.getTutors);
 router.patch(
     "/:tutorId",
     checkRole(UserRole.admin, UserRole.tutor),
     tutorController.updateTutor,
 );
-router.delete("/:tutorId", tutorController.deleteTutor);
+router.delete(
+    "/:tutorId",
+    checkRole(UserRole.admin, UserRole.tutor),
+    tutorController.deleteTutor,
+);
 
 export const tutorRoute = router;

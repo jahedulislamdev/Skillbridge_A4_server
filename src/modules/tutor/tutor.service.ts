@@ -1,15 +1,15 @@
 import { TutorWhereInput } from "../../../generated/prisma/models";
-import { Tutor } from "../../../generated/prisma/client";
+import buildTutorData from "../../helper/buildTutorData";
+import { TutorInput } from "../../types/general/tutor";
 import { UserRole } from "../../types/enum/userRole";
 import { prisma } from "../../lib/prisma";
 
-const createTutor = async (
-    data: Omit<Tutor, "id" | "createdAt" | "updatedAt">,
-    userId: string,
-) => {
+//* create tutor profile
+const createTutor = async (data: TutorInput, userId: string) => {
     // console.log({ data, id: userId });
+    const allowData = buildTutorData(data);
     const result = await prisma.$transaction(async (tx) => {
-        const tutor = await tx.tutor.create({ data: { ...data, userId } });
+        const tutor = await tx.tutor.create({ data: { ...allowData, userId } });
         await tx.user.update({
             where: { id: tutor.userId },
             data: { role: UserRole.tutor },
@@ -18,6 +18,8 @@ const createTutor = async (
     });
     return result;
 };
+
+//* get tutor list with pagination and search
 const getTutors = async (
     searchValue: string | undefined,
     rating: number | undefined,
@@ -93,28 +95,36 @@ const getTutors = async (
         },
     };
 };
+
+//* update tutor profile
 const updateTutor = async (
     tutorId: string,
     currentUserId: string,
     role: UserRole,
-    updatedData: Partial<Tutor>,
+    updatedData: TutorInput,
 ) => {
     const existValidTutor = await prisma.tutor.findUniqueOrThrow({
         where: { id: tutorId },
     });
-
     // only admin and tutor himself update his tutor profile
     if (role !== UserRole.admin && existValidTutor.userId !== currentUserId) {
         throw new Error("You are not allowed to update this profile");
     }
-
+    // send only allow data to update
+    const allowData = buildTutorData(updatedData);
     const updatedTutor = await prisma.tutor.update({
         where: { id: tutorId },
-        data: updatedData,
+        data: allowData,
     });
     return updatedTutor;
 };
-const deleteTutor = async (tutorId: string, role: UserRole) => {
+
+//* delete tutor profile
+const deleteTutor = async (
+    tutorId: string,
+    currentUserId: string,
+    role: UserRole,
+) => {
     // only admin and tutor himself delete his tutor profile
     const existValidTutor = await prisma.tutor.findUnique({
         where: { id: tutorId },
@@ -122,7 +132,9 @@ const deleteTutor = async (tutorId: string, role: UserRole) => {
     if (!existValidTutor) {
         throw new Error("Tutor not found");
     }
-    if (role !== UserRole.admin && existValidTutor.userId !== tutorId) {
+    console.log({ tutorId, currentUserId, role });
+
+    if (role !== UserRole.admin && existValidTutor.userId !== currentUserId) {
         throw new Error("You are not allowed to delete this profile");
     }
     return await prisma.tutor.delete({
@@ -131,6 +143,7 @@ const deleteTutor = async (tutorId: string, role: UserRole) => {
         },
     });
 };
+
 export const tutorService = {
     createTutor,
     getTutors,

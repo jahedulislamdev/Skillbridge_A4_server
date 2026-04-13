@@ -79,6 +79,7 @@ const deleteTutor = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const result = await tutorService.deleteTutor(
             req.params.tutorId as string,
+            req.user?.id as string,
             req.user?.role as UserRole,
         );
 
