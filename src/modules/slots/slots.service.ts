@@ -1,8 +1,9 @@
 import { DayOfWeek } from "../../../generated/prisma/enums";
-import { isValidTime } from "../../helper/timeFormatter";
+import { timevalidator } from "../../helper/timeFormatter";
 import { prisma } from "../../lib/prisma";
 import { UserRole } from "../../types/enum/userRole";
 
+//* create new slot
 const createslot = async (
     userId: string,
     dayOfWeek: DayOfWeek,
@@ -16,19 +17,7 @@ const createslot = async (
     if (!tutor) {
         throw new Error("Tutor not found");
     }
-
-    // time format check
-    if (!isValidTime(startTime) || !isValidTime(endTime)) {
-        throw new Error("Invalid time format. use this format (HH:mm:ss)");
-    }
-
-    // logical check end time cann't be lt from start time
-    const newStart = new Date(`1970-01-01T${startTime}Z`);
-    const newEnd = new Date(`1970-01-01T${endTime}Z`);
-
-    if (newStart >= newEnd) {
-        throw new Error("Start time must be before end time");
-    }
+    const { newStart, newEnd } = timevalidator(startTime, endTime);
 
     // tutor cann't create slot in same day, same time
     const existingSlot = await prisma.availabilitySlot.findFirst({
@@ -53,6 +42,8 @@ const createslot = async (
         },
     });
 };
+
+//* admin can get all slots and tutor can get his own slot
 const getSlots = async (userId: string, role: string) => {
     const existValidTutor = await prisma.tutor.findUnique({
         where: { userId },
@@ -71,4 +62,35 @@ const getSlots = async (userId: string, role: string) => {
     });
 };
 
-export const slotsService = { createslot };
+//* update slots
+const updateSlot = async (
+    slotId: string,
+    userId: string,
+    role: UserRole,
+    dayOfWeek: DayOfWeek,
+    startTime: string,
+    endTime: string,
+) => {
+    const exist = await prisma.availabilitySlot.findUnique({
+        where: { id: slotId },
+    });
+    if (!exist) {
+        throw new Error("Slot Not Found");
+    }
+    const tutor = await prisma.tutor.findUnique({ where: { userId } });
+    if (!tutor) {
+        throw new Error("Unauthorized tutor");
+    }
+    if (role !== UserRole.admin && exist.tutorId !== tutor.id) {
+        throw new Error("Your have not access to update other's slot");
+    }
+    const { newStart, newEnd } = timevalidator(startTime, endTime);
+
+    return await prisma.availabilitySlot.update({
+        where: { id: slotId },
+        data: { dayOfWeek, startTime: newStart, endTime: newEnd },
+    });
+};
+
+//* deleteuser
+export const slotsService = { createslot, getSlots, updateSlot };
