@@ -6,6 +6,7 @@ import cors from "cors";
 import { tutorRoute } from "./modules/tutor/tutor.route";
 import { errorHandler } from "./middleware/errorHandler";
 import { categoryRouter } from "./modules/categories/category.route";
+import { slotRouter } from "./modules/slots/slots.route";
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.use(cors({ origin: appConfig.app_url, credentials: true }));
 app.all("/api/auth/{*any}", toNodeHandler(auth));
 app.use("/api/v1/tutors", tutorRoute);
 app.use("/api/v1/categories", categoryRouter);
+app.use("/api/v1/slots", slotRouter);
 
 // demo route
 app.get("/", (req, res) => {
