@@ -28,7 +28,7 @@ export function checkRole(...roles: any) {
             };
 
             // check user role match or not
-            console.log(req.user);
+            // console.log(req.user);
 
             if (roles.length && !roles.includes(req.user?.role)) {
                 return res.status(401).json({

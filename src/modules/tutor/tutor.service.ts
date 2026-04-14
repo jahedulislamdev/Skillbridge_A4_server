@@ -108,6 +108,7 @@ const getTutorById = async (tutotId: string) => {
     }
     return result;
 };
+
 //* update tutor profile
 const updateTutor = async (
     tutorId: string,
