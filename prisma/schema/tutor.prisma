@@ -1,15 +1,16 @@
 // tutorsProfile
 model Tutor {
-  id              String   @id @default(uuid())
-  userId          String   @unique //FK
-  user            User     @relation(fields: [userId], references: [id])
-  bio             String   @db.VarChar(225)
-  hourlyRate      Decimal  @db.Decimal(10, 2)
-  experienceYears Int      @default(0)
-  averageRating   Float    @default(0)
-  totalReviews    Int      @default(0)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id              String      @id @default(uuid())
+  userId          String      @unique //FK
+  user            User        @relation(fields: [userId], references: [id])
+  bio             String      @db.VarChar(225)
+  hourlyRate      Decimal     @db.Decimal(10, 2)
+  experienceYears Int         @default(0)
+  averageRating   Float       @default(0)
+  status          TutomStatus @default(PENDING)
+  totalReviews    Int         @default(0)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
 
   categories        TutorCategory[]
   availabilitySlots AvailabilitySlot[]
@@ -18,4 +19,9 @@ model Tutor {
 
   @@index([userId])
   @@map("tutorsprofile")
+}
+
+enum TutomStatus {
+  APPROVED
+  PENDING
 }

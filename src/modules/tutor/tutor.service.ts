@@ -7,16 +7,14 @@ import { prisma } from "../../lib/prisma";
 //* create tutor profile
 const createTutor = async (data: TutorInput, userId: string) => {
     // console.log({ data, id: userId });
+    const exist = await prisma.tutor.findUnique({ where: { userId } });
+    if (exist) {
+        throw new Error("Cannot create duplicate tutor using same user ID");
+    }
     const allowData = buildTutorData(data);
-    const result = await prisma.$transaction(async (tx) => {
-        const tutor = await tx.tutor.create({ data: { ...allowData, userId } });
-        await tx.user.update({
-            where: { id: tutor.userId },
-            data: { role: UserRole.tutor },
-        });
-        return tutor;
+    return await prisma.tutor.create({
+        data: { ...allowData, userId },
     });
-    return result;
 };
 
 //* get tutor list with pagination and search
