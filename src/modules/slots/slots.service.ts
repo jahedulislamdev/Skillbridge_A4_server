@@ -79,10 +79,10 @@ const updateSlot = async (
     }
     const tutor = await prisma.tutor.findUnique({ where: { userId } });
     if (!tutor) {
-        throw new Error("Unauthorized tutor");
+        throw new Error("Unauthorized");
     }
     if (role !== UserRole.admin && exist.tutorId !== tutor.id) {
-        throw new Error("Your have not access to update other's slot");
+        throw new Error("You have no access to update others slot");
     }
     const { newStart, newEnd } = timevalidator(startTime, endTime);
 
@@ -93,4 +93,21 @@ const updateSlot = async (
 };
 
 //* deleteuser
-export const slotsService = { createslot, getSlots, updateSlot };
+const deleteSlot = async (slotId: string, userId: string, role: UserRole) => {
+    const exist = await prisma.availabilitySlot.findUnique({
+        where: { id: slotId },
+    });
+    if (!exist) {
+        throw new Error("Slot Not Found");
+    }
+    const tutor = await prisma.tutor.findUnique({ where: { userId } });
+    if (!tutor) {
+        throw new Error("Unauthorized");
+    }
+    if (role !== UserRole.admin && exist.tutorId !== tutor.id) {
+        throw new Error("You have no access to delete others slot");
+    }
+
+    return await prisma.availabilitySlot.delete({ where: { id: slotId } });
+};
+export const slotsService = { createslot, getSlots, updateSlot, deleteSlot };

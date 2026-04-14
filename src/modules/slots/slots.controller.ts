@@ -58,8 +58,26 @@ const updateSlot = async (req: Request, res: Response, next: NextFunction) => {
         next(err);
     }
 };
+const deleteSlot = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const result = await slotsService.deleteSlot(
+            req.params.slotId as string,
+            req.user?.id as string,
+            req.user?.role as UserRole,
+        );
+
+        res.status(200).json({
+            success: true,
+            message: "slot updated successfully",
+            data: result,
+        });
+    } catch (err) {
+        next(err);
+    }
+};
 export const SlotController = {
     createSlot,
     getSlots,
     updateSlot,
+    deleteSlot,
 };

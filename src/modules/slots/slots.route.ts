@@ -20,5 +20,10 @@ router.patch(
     checkRole(UserRole.admin, UserRole.tutor),
     SlotController.updateSlot,
 );
+router.delete(
+    "/:slotId",
+    checkRole(UserRole.admin, UserRole.tutor),
+    SlotController.deleteSlot,
+);
 
 export const slotRouter = router;
