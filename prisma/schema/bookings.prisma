@@ -19,8 +19,7 @@ model Booking {
   updatedAt DateTime @updatedAt
 
   review Review?
-
-  @@unique([tutorId, slotId])
+ 
   @@index([studentId])
   @@index([tutorId, slotId])
   @@map("bookings")

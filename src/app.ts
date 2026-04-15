@@ -7,6 +7,7 @@ import { tutorRoute } from "./modules/tutor/tutor.route";
 import { errorHandler } from "./middleware/errorHandler";
 import { categoryRouter } from "./modules/categories/category.route";
 import { slotRouter } from "./modules/slots/slots.route";
+import { bookingRouter } from "./modules/bookings/booking.route";
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.all("/api/auth/{*any}", toNodeHandler(auth));
 app.use("/api/v1/tutors", tutorRoute);
 app.use("/api/v1/categories", categoryRouter);
 app.use("/api/v1/slots", slotRouter);
+app.use("/api/v1/bookings", bookingRouter);
 
 // demo route
 app.get("/", (req, res) => {
