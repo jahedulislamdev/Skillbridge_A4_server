@@ -1,6 +1,7 @@
 import { calculateBookingPrice } from "../../helper/getBookingPrice";
-import { prisma } from "../../lib/prisma";
 import { UserRole } from "../../types/enum/userRole";
+import { prisma } from "../../lib/prisma";
+import { BookingStatus } from "../../../generated/prisma/enums";
 
 //* create bookig (user(student) can booking available slots)
 const createBooking = async (
@@ -52,6 +53,7 @@ const createBooking = async (
     });
     return result;
 };
+
 //* get bookigs
 const getBookings = async (userId: string, role: UserRole) => {
     if (role === UserRole.admin) {
@@ -67,10 +69,86 @@ const getBookings = async (userId: string, role: UserRole) => {
     }
     return studentBookings;
 };
+
 //* update booking
+const updateBooking = async (
+    bookingId: string,
+    userId: string,
+    role: UserRole,
+    status: BookingStatus,
+    meetingLink?: string,
+) => {
+    const existBooking = await prisma.booking.findUnique({
+        where: { id: bookingId },
+    });
+    if (!existBooking) {
+        throw new Error("Booking Not Found!");
+    }
+    // admin can change status and meeting link.
+    if (role === UserRole.admin) {
+        return await prisma.booking.update({
+            where: { id: bookingId },
+            data: {
+                status,
+                meetingLink: meetingLink ?? null,
+            },
+        });
+    }
+    // check ownership (bcz a tutor can booked oter tutor's slot as a student)
+    const tutor = await prisma.tutor.findUnique({ where: { userId } });
+    const isTutorOfThisBooking = tutor && tutor.id === existBooking.tutorId;
+    const isStudentOfThisBooking = existBooking.studentId === userId;
+
+    //*  tutor can change the status and meetinglink also.
+    if (isTutorOfThisBooking) {
+        return prisma.booking.update({
+            where: { id: bookingId },
+            data: { status, meetingLink: meetingLink ?? null },
+        });
+    }
+
+    //* student can change status "CANCELLED" only.
+    if (isStudentOfThisBooking) {
+        // prevent changes except cancel status
+        if (status !== BookingStatus.CANCELLED) {
+            throw new Error("Student can only cancel booking");
+        }
+        return prisma.booking.update({
+            where: { id: bookingId },
+            data: { status: BookingStatus.CANCELLED },
+        });
+    }
+
+    throw new Error("Unauthorized");
+};
 //* delete booking
+const deleteBooking = async (bookingId: string, role: UserRole) => {
+    const booking = await prisma.booking.findUnique({
+        where: { id: bookingId },
+    });
+
+    if (!booking) {
+        throw new Error("Booking Not Found!");
+    }
+
+    // only admin can delete booking
+    if (role !== UserRole.admin) {
+        throw new Error("Only admin can delete booking");
+    }
+
+    //  prevent deleting compleated booking
+    if (booking.status === BookingStatus.COMPLETED) {
+        throw new Error("Completed booking cannot be deleted");
+    }
+
+    return await prisma.booking.delete({
+        where: { id: bookingId },
+    });
+};
 
 export const bookingService = {
     createBooking,
     getBookings,
+    updateBooking,
+    deleteBooking,
 };

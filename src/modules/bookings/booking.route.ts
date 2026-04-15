@@ -15,5 +15,15 @@ router.get(
     checkRole(UserRole.admin, UserRole.tutor, UserRole.user),
     bookingController.getBookings,
 );
+router.patch(
+    "/:bookingId",
+    checkRole(UserRole.admin, UserRole.tutor, UserRole.user),
+    bookingController.updateBookings,
+);
+router.delete(
+    "/:bookingId",
+    checkRole(UserRole.admin, UserRole.tutor, UserRole.user),
+    bookingController.deleteBookings,
+);
 
 export const bookingRouter = router;
