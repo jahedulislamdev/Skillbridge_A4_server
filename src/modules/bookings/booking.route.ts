@@ -8,7 +8,12 @@ const router = Router();
 router.post(
     "/:slotId",
     checkRole(UserRole.user, UserRole.tutor, UserRole.admin),
-    bookingController.createSlot,
+    bookingController.createBooking,
+);
+router.get(
+    "/",
+    checkRole(UserRole.admin, UserRole.tutor, UserRole.user),
+    bookingController.getBookings,
 );
 
 export const bookingRouter = router;

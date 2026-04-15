@@ -1,5 +1,6 @@
 import { calculateBookingPrice } from "../../helper/getBookingPrice";
 import { prisma } from "../../lib/prisma";
+import { UserRole } from "../../types/enum/userRole";
 
 //* create bookig (user(student) can booking available slots)
 const createBooking = async (
@@ -52,9 +53,24 @@ const createBooking = async (
     return result;
 };
 //* get bookigs
+const getBookings = async (userId: string, role: UserRole) => {
+    if (role === UserRole.admin) {
+        return await prisma.booking.findMany();
+    }
+    const studentBookings = await prisma.booking.findMany({
+        where: {
+            studentId: userId,
+        },
+    });
+    if (studentBookings.length === 0) {
+        return [];
+    }
+    return studentBookings;
+};
 //* update booking
 //* delete booking
 
 export const bookingService = {
     createBooking,
+    getBookings,
 };
