@@ -8,6 +8,7 @@ import { errorHandler } from "./middleware/errorHandler";
 import { categoryRouter } from "./modules/categories/category.route";
 import { slotRouter } from "./modules/slots/slots.route";
 import { bookingRouter } from "./modules/bookings/booking.route";
+import { reviewRouter } from "./modules/review/review.route";
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.use("/api/v1/tutors", tutorRoute);
 app.use("/api/v1/categories", categoryRouter);
 app.use("/api/v1/slots", slotRouter);
 app.use("/api/v1/bookings", bookingRouter);
+app.use("/api/v1/reviews", reviewRouter);
 
 // demo route
 app.get("/", (req, res) => {
