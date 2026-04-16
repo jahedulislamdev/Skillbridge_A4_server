@@ -32,7 +32,7 @@ const createReview = async (
     });
 
     if (existingReview) {
-        throw new Error("You already submitted a review for this booking");
+        throw new Error("You already submitted you review");
     }
 
     return await prisma.review.create({
@@ -50,16 +50,34 @@ const createReview = async (
 
 //* get review
 const getReviews = async (bookingId: string) => {
+    const booking = await prisma.booking.findUnique({
+        where: { id: bookingId },
+    });
+    if (!booking) {
+        throw new Error("Booking not Found!");
+    }
     return await prisma.review.findMany({
         where: { bookingId },
         include: {
-            student: true,
+            student: {
+                select: {
+                    id: true,
+                    name: true,
+                    image: true,
+                },
+            },
         },
     });
 };
 
 //* get review by Id
 const getReviewById = async (reviewId: string) => {
+    const review = await prisma.review.findUnique({
+        where: { id: reviewId },
+    });
+    if (!review) {
+        throw new Error("Review not Found!");
+    }
     return await prisma.review.findUnique({
         where: { id: reviewId },
     });
