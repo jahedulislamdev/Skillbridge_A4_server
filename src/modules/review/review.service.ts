@@ -1,4 +1,5 @@
 import { BookingStatus } from "../../../generated/prisma/enums";
+import { updateTutorRating } from "../../helper/updateTutorRating";
 import { prisma } from "../../lib/prisma";
 import { UserRole } from "../../types/enum/userRole";
 
@@ -23,27 +24,32 @@ const createReview = async (
             "You cannot submit a review before completing your session",
         );
     }
-
-    const existingReview = await prisma.review.findFirst({
-        where: {
-            bookingId,
-            studentId: userId,
-        },
+    return await prisma.$transaction(async (tx) => {
+        const existingReview = await tx.review.findFirst({
+            where: {
+                bookingId,
+                studentId: userId,
+            },
+        });
+        if (existingReview) {
+            throw new Error("You already submitted your review");
+        }
+        if (rating < 1 || rating > 5) {
+            throw new Error("Rating must be between 1 and 5");
+        }
+        const review = await tx.review.create({
+            data: {
+                rating,
+                comment: comment ?? null,
+                studentId: userId,
+                tutorId: booking.tutorId,
+                bookingId: bookingId,
+            },
+        });
+        await updateTutorRating(tx, booking.tutorId);
+        return review;
     });
 
-    if (existingReview) {
-        throw new Error("You already submitted you review");
-    }
-
-    return await prisma.review.create({
-        data: {
-            rating,
-            comment: comment ?? null,
-            studentId: userId,
-            tutorId: booking.tutorId,
-            bookingId: bookingId,
-        },
-    });
     // student can review (1 student 1booking 1 review) when bookings compleated
     // studentId, bookingId need
 };
@@ -90,7 +96,10 @@ const updateReview = async (
     rating: number,
     comment?: string,
 ) => {
-    const review = await prisma.review.findUnique({ where: { id: reviewId } });
+    const review = await prisma.review.findUnique({
+        where: { id: reviewId },
+        select: { tutorId: true, studentId: true },
+    });
     if (!review) {
         throw new Error("Review not Found!");
     }
@@ -100,12 +109,16 @@ const updateReview = async (
     if (rating < 1 || rating > 5) {
         throw new Error("Rating must be between 1 and 5");
     }
-    return await prisma.review.update({
-        where: { id: reviewId },
-        data: {
-            rating,
-            comment: comment?.trim() ? comment : null,
-        },
+    return await prisma.$transaction(async (tx) => {
+        const result = await tx.review.update({
+            where: { id: reviewId },
+            data: {
+                rating,
+                comment: comment?.trim() ? comment : null,
+            },
+        });
+        await updateTutorRating(tx, review.tutorId);
+        return result;
     });
 };
 
@@ -115,14 +128,21 @@ const deleteReview = async (
     userId: string,
     role: UserRole,
 ) => {
-    const review = await prisma.review.findUnique({ where: { id: reviewId } });
+    const review = await prisma.review.findUnique({
+        where: { id: reviewId },
+        select: { tutorId: true, studentId: true },
+    });
     if (!review) {
         throw new Error("Review Not Found!");
     }
     if (role !== UserRole.admin && review.studentId !== userId) {
         throw new Error("You are not allow to delete this review");
     }
-    return await prisma.review.delete({ where: { id: reviewId } });
+    return await prisma.$transaction(async (tx) => {
+        const result = await tx.review.delete({ where: { id: reviewId } });
+        await updateTutorRating(tx, review.tutorId);
+        return result;
+    });
 };
 
 export const reviewService = {

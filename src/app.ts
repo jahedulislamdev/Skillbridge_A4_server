@@ -9,6 +9,7 @@ import { categoryRouter } from "./modules/categories/category.route";
 import { slotRouter } from "./modules/slots/slots.route";
 import { bookingRouter } from "./modules/bookings/booking.route";
 import { reviewRouter } from "./modules/review/review.route";
+import { dashboardRoute } from "./modules/dashboard/dashboard.route";
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.use("/api/v1/categories", categoryRouter);
 app.use("/api/v1/slots", slotRouter);
 app.use("/api/v1/bookings", bookingRouter);
 app.use("/api/v1/reviews", reviewRouter);
+app.use("/api/v1/dashboard", dashboardRoute);
 
 // demo route
 app.get("/", (req, res) => {

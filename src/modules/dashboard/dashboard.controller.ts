@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { dashboardService } from "./dashboard.service";
 
-//* get tutors
+//* get dashboard stats
 const getDashboardStats = async (
     req: Request,
     res: Response,
