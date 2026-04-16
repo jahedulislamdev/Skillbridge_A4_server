@@ -15,6 +15,11 @@ router.get(
     checkRole(UserRole.admin, UserRole.tutor, UserRole.user),
     bookingController.getBookings,
 );
+router.get(
+    "/:bookingId",
+    checkRole(UserRole.admin, UserRole.tutor),
+    bookingController.getBookingById,
+);
 router.patch(
     "/:bookingId",
     checkRole(UserRole.admin, UserRole.tutor, UserRole.user),

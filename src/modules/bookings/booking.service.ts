@@ -1,7 +1,7 @@
 import { calculateBookingPrice } from "../../helper/getBookingPrice";
+import { BookingStatus } from "../../../generated/prisma/enums";
 import { UserRole } from "../../types/enum/userRole";
 import { prisma } from "../../lib/prisma";
-import { BookingStatus } from "../../../generated/prisma/enums";
 
 //* create bookig (user(student) can booking available slots)
 const createBooking = async (
@@ -70,6 +70,30 @@ const getBookings = async (userId: string, role: UserRole) => {
     return studentBookings;
 };
 
+//* get booking  by Id
+const getBookingById = async (
+    bookingId: string,
+    userId: string,
+    role: UserRole,
+) => {
+    const booking = await prisma.booking.findUnique({
+        where: { id: bookingId },
+        include: { tutor: true },
+    });
+    if (!booking) {
+        throw new Error("booking not found");
+    }
+
+    //* only tutor and and admin can get individual booking
+    if (
+        role !== UserRole.admin &&
+        (role !== UserRole.tutor || booking.tutor.userId !== userId)
+    ) {
+        throw new Error("Unauthorized");
+    }
+    return booking;
+};
+
 //* update booking
 const updateBooking = async (
     bookingId: string,
@@ -121,6 +145,7 @@ const updateBooking = async (
 
     throw new Error("Unauthorized");
 };
+
 //* delete booking
 const deleteBooking = async (bookingId: string, role: UserRole) => {
     const booking = await prisma.booking.findUnique({
@@ -151,4 +176,5 @@ export const bookingService = {
     getBookings,
     updateBooking,
     deleteBooking,
+    getBookingById,
 };
