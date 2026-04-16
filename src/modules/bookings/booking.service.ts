@@ -78,7 +78,7 @@ const getBookingById = async (
 ) => {
     const booking = await prisma.booking.findUnique({
         where: { id: bookingId },
-        include: { tutor: true },
+        include: { tutor: { select: { userId: true } } },
     });
     if (!booking) {
         throw new Error("booking not found");

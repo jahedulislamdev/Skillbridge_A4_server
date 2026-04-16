@@ -10,11 +10,8 @@ router.post(
     checkRole(UserRole.admin, UserRole.tutor),
     SlotController.createSlot,
 );
-router.get(
-    "/",
-    checkRole(UserRole.admin, UserRole.tutor),
-    SlotController.getSlots,
-);
+router.get("/", SlotController.getSlots);
+router.get("/:slotId", checkRole(), SlotController.getSlots);
 router.patch(
     "/:slotId",
     checkRole(UserRole.admin, UserRole.tutor),

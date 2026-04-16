@@ -23,11 +23,21 @@ const createSlot = async (req: Request, res: Response, next: NextFunction) => {
 };
 const getSlots = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const result = await slotsService.getSlots(
-            req.user?.id as string,
-            req.user?.role as UserRole,
+        const result = await slotsService.getSlots();
+        res.status(200).json({
+            success: true,
+            message: "slots retrives successfully",
+            data: result,
+        });
+    } catch (err) {
+        next(err);
+    }
+};
+const getSlotById = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const result = await slotsService.getSlotById(
+            req.params.slotId as string,
         );
-
         res.status(200).json({
             success: true,
             message: "slots retrives successfully",
@@ -78,6 +88,7 @@ const deleteSlot = async (req: Request, res: Response, next: NextFunction) => {
 export const SlotController = {
     createSlot,
     getSlots,
+    getSlotById,
     updateSlot,
     deleteSlot,
 };

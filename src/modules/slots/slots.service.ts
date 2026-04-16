@@ -43,23 +43,20 @@ const createslot = async (
     });
 };
 
-//* admin can get all slots and tutor can get his own slot
-const getSlots = async (userId: string, role: string) => {
-    const existValidTutor = await prisma.tutor.findUnique({
-        where: { userId },
+//* everyone can get slots
+const getSlots = async () => {
+    return await prisma.availabilitySlot.findMany();
+};
+
+const getSlotById = async (slotId: string) => {
+    const slot = await prisma.availabilitySlot.findUnique({
+        where: { id: slotId },
+        include: { tutor: { select: { id: true, userId: true } } },
     });
-    if (!existValidTutor) {
-        throw new Error("Tutor not Found!");
+    if (!slot) {
+        throw new Error("Slot not Found!");
     }
-    if (role === UserRole.admin) {
-        return await prisma.availabilitySlot.findMany();
-    }
-    if (role !== UserRole.tutor || existValidTutor.userId !== userId) {
-        throw new Error("your are not permited to create slots! ");
-    }
-    return await prisma.availabilitySlot.findMany({
-        where: { tutorId: existValidTutor.id },
-    });
+    return slot;
 };
 
 //* update slots
@@ -110,4 +107,10 @@ const deleteSlot = async (slotId: string, userId: string, role: UserRole) => {
 
     return await prisma.availabilitySlot.delete({ where: { id: slotId } });
 };
-export const slotsService = { createslot, getSlots, updateSlot, deleteSlot };
+export const slotsService = {
+    createslot,
+    getSlots,
+    updateSlot,
+    deleteSlot,
+    getSlotById,
+};
