@@ -80,13 +80,26 @@ const getReviews = async (bookingId: string) => {
 const getReviewById = async (reviewId: string) => {
     const review = await prisma.review.findUnique({
         where: { id: reviewId },
+        include: {
+            booking: {
+                select: {
+                    id: true,
+                    slotId: true,
+                    scheduledAt: true,
+                },
+            },
+            student: {
+                select: {
+                    name: true,
+                    image: true,
+                },
+            },
+        },
     });
     if (!review) {
         throw new Error("Review not Found!");
     }
-    return await prisma.review.findUnique({
-        where: { id: reviewId },
-    });
+    return review;
 };
 
 //* update review (only student can update their review)

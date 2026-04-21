@@ -46,7 +46,7 @@ const getTutors = async (req: Request, res: Response, next: NextFunction) => {
 
         res.status(200).json({
             success: true,
-            message: "tutor retrived successfully",
+            message: "tutor retrieved successfully",
             data: result,
         });
     } catch (err) {
@@ -67,7 +67,7 @@ const getTutorById = async (
 
         res.status(200).json({
             success: true,
-            message: "tutor created successfully",
+            message: "tutor retrieved successfully",
             data: result,
         });
     } catch (err) {
@@ -76,12 +76,12 @@ const getTutorById = async (
 };
 //* update tutor
 const updateTutor = async (req: Request, res: Response, next: NextFunction) => {
-    console.log({
-        tutorId: req.params.tutorId,
-        currentUserId: req.user?.id,
-        userRole: req.user?.role,
-        updatedData: req.body,
-    });
+    // console.log({
+    //     tutorId: req.params.tutorId,
+    //     currentUserId: req.user?.id,
+    //     userRole: req.user?.role,
+    //     updatedData: req.body,
+    // });
 
     try {
         const result = await tutorService.updateTutor(

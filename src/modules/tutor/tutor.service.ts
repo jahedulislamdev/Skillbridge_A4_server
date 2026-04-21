@@ -25,13 +25,13 @@ const getTutors = async (
     limit: number,
     skip: number,
 ) => {
-    console.log("query params from service : ", {
-        searchValue,
-        rating,
-        page,
-        limit,
-        skip,
-    });
+    // console.log("query params from service : ", {
+    //     searchValue,
+    //     rating,
+    //     page,
+    //     limit,
+    //     skip,
+    // });
 
     const addConditon: TutorWhereInput[] = [];
     if (searchValue) {
@@ -65,7 +65,9 @@ const getTutors = async (
         include: {
             user: {
                 select: {
+                    id: true,
                     name: true,
+                    image: true,
                 },
             },
             reviews: true,
@@ -76,7 +78,7 @@ const getTutors = async (
             createdAt: "asc",
         },
     });
-    const totalTutor = await prisma.tutor.count({
+    const total = await prisma.tutor.count({
         where: {
             AND: addConditon,
         },
@@ -86,10 +88,10 @@ const getTutors = async (
     return {
         tutors: result,
         meta: {
-            totalTutor,
+            total,
             page,
             limit,
-            totalPage: Math.ceil(totalTutor / limit),
+            totalPage: Math.ceil(total / limit),
         },
     };
 };
@@ -99,6 +101,35 @@ const getTutorById = async (tutotId: string) => {
     const result = await prisma.tutor.findUnique({
         where: {
             id: tutotId,
+        },
+        include: {
+            user: {
+                select: {
+                    id: true,
+                    name: true,
+                    image: true,
+                },
+            },
+            availabilitySlots: true,
+            reviews: {
+                select: {
+                    id: true,
+                    comment: true,
+                    rating: true,
+                    student: {
+                        select: {
+                            name: true,
+                            image: true,
+                        },
+                    },
+                    booking: {
+                        select: {
+                            slotId: true,
+                            scheduledAt: true,
+                        },
+                    },
+                },
+            },
         },
     });
     if (!result) {
@@ -146,7 +177,7 @@ const deleteTutor = async (
     if (!existValidTutor) {
         throw new Error("Tutor not found");
     }
-    console.log({ tutorId, currentUserId, role });
+    // console.log({ tutorId, currentUserId, role });
 
     if (role !== UserRole.admin && existValidTutor.userId !== currentUserId) {
         throw new Error("You are not allowed to delete this profile");

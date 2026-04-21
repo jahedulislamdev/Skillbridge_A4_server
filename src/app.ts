@@ -10,6 +10,7 @@ import { slotRouter } from "./modules/slots/slots.route";
 import { bookingRouter } from "./modules/bookings/booking.route";
 import { reviewRouter } from "./modules/review/review.route";
 import { dashboardRoute } from "./modules/dashboard/dashboard.route";
+import { userRouter } from "./modules/users/users.route";
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use(cors({ origin: appConfig.app_url, credentials: true }));
 
 // routes
 app.all("/api/auth/{*any}", toNodeHandler(auth));
+app.use("/api/v1/users", userRouter);
 app.use("/api/v1/tutors", tutorRoute);
 app.use("/api/v1/categories", categoryRouter);
 app.use("/api/v1/slots", slotRouter);

@@ -1,6 +1,6 @@
 import { Pagination, PaginationResult } from "../types/general/paginationType";
 
-export default function buildPagination(options: any): PaginationResult {
+export default function buildPagination(options: Pagination): PaginationResult {
     //  console.log("pagination options : ", options);
 
     const page = Number(options.page) || 1;
