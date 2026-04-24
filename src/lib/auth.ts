@@ -18,7 +18,7 @@ export const auth = betterAuth({
     database: prismaAdapter(prisma, {
         provider: "postgresql", // or "mysql", "postgresql", ...etc
     }),
-    trustedOrigins: [appConfig.app_url!],
+    trustedOrigins: [appConfig.app_url! || "http://localhost:3000"],
     user: {
         additionalFields: {
             role: {
@@ -28,6 +28,12 @@ export const auth = betterAuth({
             },
         },
     },
+    emailAndPassword: {
+        enabled: true,
+        autoSignIn: false,
+        requireEmailVerification: true,
+    },
+
     socialProviders: {
         google: {
             prompt: "select_account consent",
@@ -36,6 +42,7 @@ export const auth = betterAuth({
             clientSecret: appConfig.gc_pass as string,
         },
     },
+
     emailVerification: {
         sendOnSignUp: true,
         autoSignInAfterVerification: true,
@@ -153,10 +160,5 @@ export const auth = betterAuth({
                 throw error;
             }
         },
-    },
-    emailAndPassword: {
-        enabled: true,
-        autoSignIn: false,
-        requireEmailVerification: true,
     },
 });

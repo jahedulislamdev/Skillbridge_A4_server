@@ -18,12 +18,15 @@ const createTutor = async (data: TutorInput, userId: string) => {
 };
 
 //* get tutor list with pagination and search
+
 const getTutors = async (
-    searchValue: string | undefined,
+    search: string | undefined,
     rating: number | undefined,
     page: number,
     limit: number,
     skip: number,
+    priceMin: number | undefined,
+    priceMax: number | undefined,
 ) => {
     // console.log("query params from service : ", {
     //     searchValue,
@@ -34,13 +37,13 @@ const getTutors = async (
     // });
 
     const addConditon: TutorWhereInput[] = [];
-    if (searchValue) {
+    if (search) {
         addConditon.push({
             OR: [
                 {
                     user: {
                         name: {
-                            contains: searchValue,
+                            contains: search,
                             mode: "insensitive",
                         },
                     },
@@ -52,6 +55,16 @@ const getTutors = async (
         addConditon.push({
             averageRating: {
                 gte: Number(rating),
+            },
+        });
+    }
+    // console.log("from service :", { priceMin, priceMax });
+
+    if (priceMin !== undefined || priceMax !== undefined) {
+        addConditon.push({
+            hourlyRate: {
+                ...(priceMin !== undefined && { gte: priceMin }),
+                ...(priceMax !== undefined && { lte: priceMax }),
             },
         });
     }

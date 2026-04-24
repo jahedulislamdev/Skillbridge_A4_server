@@ -24,16 +24,34 @@ const createTutor = async (req: Request, res: Response, next: NextFunction) => {
 //* get tutors
 const getTutors = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { search, rating } = req.query;
-
+        const { search, rating, priceMin, priceMax } = req.query;
+        // console.log("from controller :", { priceMin, priceMax });
+        //*  search
         const searchParams =
             typeof search === "string" && search.trim() !== ""
                 ? search.trim()
                 : undefined;
 
-        const tutorRating = parseInt(rating as string);
-        const { page, limit, skip } = buildPagination(req.query);
+        //* rating
+        const tutorRating =
+            typeof rating === "string" && !isNaN(Number(rating))
+                ? Number(rating)
+                : undefined;
 
+        //* min price
+        const minPrice =
+            typeof priceMin === "string" && !isNaN(Number(priceMin))
+                ? Number(priceMin)
+                : undefined;
+
+        //* price max
+        const maxPrice =
+            typeof priceMax === "string" && !isNaN(Number(priceMax))
+                ? Number(priceMax)
+                : undefined;
+
+        //* page limit and skiped data
+        const { page, limit, skip } = buildPagination(req.query);
         // console.log({ page, limit, skip, searchParams, rating });
 
         const result = await tutorService.getTutors(
@@ -42,6 +60,8 @@ const getTutors = async (req: Request, res: Response, next: NextFunction) => {
             page,
             limit,
             skip,
+            minPrice,
+            maxPrice,
         );
 
         res.status(200).json({

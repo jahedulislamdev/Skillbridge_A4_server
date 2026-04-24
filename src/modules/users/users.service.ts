@@ -1,6 +1,6 @@
 import { UserWhereInput } from "../../../generated/prisma/models";
-import { prisma } from "../../lib/prisma";
 import { UserRole } from "../../types/enum/userRole";
+import { prisma } from "../../lib/prisma";
 
 const getUsers = async (
     role: UserRole,
