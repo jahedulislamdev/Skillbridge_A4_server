@@ -1,29 +1,25 @@
 import { Router } from "express";
 import { checkRole } from "../../middleware/requireAuth";
-import { subjectCategoryController } from "./categories.controller";
+import { subjectController } from "./categories.controller";
 import { UserRole } from "../../types/enum/userRole";
 
 const router = Router();
 
-router.post(
-    "/",
-    checkRole(UserRole.admin),
-    subjectCategoryController.createSubjectCategory,
-);
-router.get("/", subjectCategoryController.getSubjectCategories);
+router.post("/", checkRole(UserRole.admin), subjectController.createSubject);
+router.get("/", subjectController.getSubjects);
 router.get(
     "/:categoryId",
     checkRole(UserRole.admin),
-    subjectCategoryController.getSubjectCategoryById,
+    subjectController.getSubjectById,
 );
 router.patch(
     "/:categoryId",
     checkRole(UserRole.admin),
-    subjectCategoryController.updateSubjectCategory,
+    subjectController.updateSubject,
 );
 router.delete(
     "/:categoryId",
     checkRole(UserRole.admin),
-    subjectCategoryController.deleteSubjectCategory,
+    subjectController.deleteSubject,
 );
 export const categoryRouter = router;

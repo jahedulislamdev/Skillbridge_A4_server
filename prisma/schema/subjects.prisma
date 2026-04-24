@@ -4,5 +4,5 @@ model subjects {
   name          String         @db.VarChar(50)
   tutorSubjects TutorSubject[]
 
-  @@map("subjectCategories")
+  @@map("subjects")
 }

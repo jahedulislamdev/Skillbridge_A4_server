@@ -1,14 +1,18 @@
-import { subjectCategoryService } from "./categories.service";
+import { UserRole } from "../../types/enum/userRole";
+import { subjectService } from "./categories.service";
 import { NextFunction, Request, Response } from "express";
 
-const createSubjectCategory = async (
+const createSubject = async (
     req: Request,
     res: Response,
     next: NextFunction,
 ) => {
     try {
         const { name } = req.body;
-        const result = await subjectCategoryService.createSubjectCategory(name);
+        const result = await subjectService.createSubject(
+            name,
+            req.user?.role as UserRole,
+        );
 
         res.status(201).json({
             success: true,
@@ -19,13 +23,9 @@ const createSubjectCategory = async (
         next(err);
     }
 };
-const getSubjectCategories = async (
-    req: Request,
-    res: Response,
-    next: NextFunction,
-) => {
+const getSubjects = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const result = await subjectCategoryService.getSubjectCategories();
+        const result = await subjectService.getSubjects();
 
         res.status(200).json({
             success: true,
@@ -36,13 +36,13 @@ const getSubjectCategories = async (
         next(err);
     }
 };
-const getSubjectCategoryById = async (
+const getSubjectById = async (
     req: Request,
     res: Response,
     next: NextFunction,
 ) => {
     try {
-        const result = await subjectCategoryService.getSubjectCategoryById(
+        const result = await subjectService.getSubjectById(
             req.params.categoryId as string,
         );
 
@@ -55,16 +55,17 @@ const getSubjectCategoryById = async (
         next(err);
     }
 };
-const updateSubjectCategory = async (
+const updateSubject = async (
     req: Request,
     res: Response,
     next: NextFunction,
 ) => {
     try {
         const { name } = req.body;
-        const result = await subjectCategoryService.updateSubjectCategory(
+        const result = await subjectService.updateSubject(
             req.params.categoryId as string,
             name,
+            req.user?.role as UserRole,
         );
 
         res.status(200).json({
@@ -76,14 +77,15 @@ const updateSubjectCategory = async (
         next(err);
     }
 };
-const deleteSubjectCategory = async (
+const deleteSubject = async (
     req: Request,
     res: Response,
     next: NextFunction,
 ) => {
     try {
-        const result = await subjectCategoryService.deleteSubjectCategory(
+        const result = await subjectService.deleteSubject(
             req.params.categoryId as string,
+            req.user?.role as UserRole,
         );
         res.status(200).json({
             success: true,
@@ -95,10 +97,10 @@ const deleteSubjectCategory = async (
     }
 };
 
-export const subjectCategoryController = {
-    createSubjectCategory,
-    getSubjectCategories,
-    updateSubjectCategory,
-    deleteSubjectCategory,
-    getSubjectCategoryById,
+export const subjectController = {
+    createSubject,
+    getSubjects,
+    getSubjectById,
+    updateSubject,
+    deleteSubject,
 };

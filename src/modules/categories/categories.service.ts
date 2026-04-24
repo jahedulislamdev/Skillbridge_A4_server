@@ -1,11 +1,15 @@
 import { prisma } from "../../lib/prisma";
+import { UserRole } from "../../types/enum/userRole";
 
 //* create subject category
-const createSubjectCategory = async (categoryName: string) => {
+const createSubject = async (categoryName: string, role: UserRole) => {
     if (!categoryName && categoryName.trim() === "") {
         throw new Error("Category name is required");
     }
-    const existing = await prisma.category.findFirst({
+    if (role !== UserRole.admin) {
+        throw new Error("unauthorized");
+    }
+    const existing = await prisma.subjects.findFirst({
         where: {
             name: categoryName,
         },
@@ -13,17 +17,17 @@ const createSubjectCategory = async (categoryName: string) => {
     if (existing) {
         throw new Error("Category already exists");
     }
-    return await prisma.category.create({ data: { name: categoryName } });
+    return await prisma.subjects.create({ data: { name: categoryName } });
 };
 
 //* get subject category
-const getSubjectCategories = async () => {
-    return await prisma.category.findMany();
+const getSubjects = async () => {
+    return await prisma.subjects.findMany();
 };
 
 //* get subject category by id
-const getSubjectCategoryById = async (categoryId: string) => {
-    const result = await prisma.category.findUnique({
+const getSubjectById = async (categoryId: string) => {
+    const result = await prisma.subjects.findUnique({
         where: {
             id: categoryId,
         },
@@ -35,11 +39,15 @@ const getSubjectCategoryById = async (categoryId: string) => {
 };
 
 //* update subject category
-const updateSubjectCategory = async (
+const updateSubject = async (
     categoryId: string,
     updatedName: string,
+    role: UserRole,
 ) => {
-    const existing = await prisma.category.findUnique({
+    if (role !== UserRole.admin) {
+        throw new Error("unauthorized");
+    }
+    const existing = await prisma.subjects.findUnique({
         where: {
             id: categoryId,
         },
@@ -47,7 +55,7 @@ const updateSubjectCategory = async (
     if (!existing) {
         throw new Error("Category not found");
     }
-    return await prisma.category.update({
+    return await prisma.subjects.update({
         where: {
             id: categoryId,
         },
@@ -58,8 +66,11 @@ const updateSubjectCategory = async (
 };
 
 //* delee subject category
-const deleteSubjectCategory = async (categoryId: string) => {
-    const existing = await prisma.category.findUnique({
+const deleteSubject = async (categoryId: string, role: UserRole) => {
+    if (role !== UserRole.admin) {
+        throw new Error("unauthorized");
+    }
+    const existing = await prisma.subjects.findUnique({
         where: {
             id: categoryId,
         },
@@ -67,17 +78,17 @@ const deleteSubjectCategory = async (categoryId: string) => {
     if (!existing) {
         throw new Error("Category not found");
     }
-    return await prisma.category.delete({
+    return await prisma.subjects.delete({
         where: {
             id: categoryId,
         },
     });
 };
 
-export const subjectCategoryService = {
-    createSubjectCategory,
-    getSubjectCategories,
-    updateSubjectCategory,
-    deleteSubjectCategory,
-    getSubjectCategoryById,
+export const subjectService = {
+    createSubject,
+    getSubjects,
+    getSubjectById,
+    updateSubject,
+    deleteSubject,
 };
