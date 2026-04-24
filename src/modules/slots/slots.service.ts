@@ -45,7 +45,24 @@ const createslot = async (
 
 //* everyone can get slots
 const getSlots = async () => {
-    return await prisma.availabilitySlot.findMany();
+    return await prisma.availabilitySlot.findMany({
+        include: {
+            tutor: {
+                select: {
+                    hourlyRate: true,
+                    experienceYears: true,
+                    categories: true,
+                    availabilitySlots: true,
+                    user: {
+                        select: {
+                            name: true,
+                            image: true,
+                        },
+                    },
+                },
+            },
+        },
+    });
 };
 
 const getSlotById = async (slotId: string) => {

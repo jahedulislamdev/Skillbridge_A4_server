@@ -19,7 +19,7 @@ model Booking {
   updatedAt DateTime @updatedAt
 
   review Review?
- 
+
   @@index([studentId])
   @@index([tutorId, slotId])
   @@map("bookings")

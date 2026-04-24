@@ -12,7 +12,7 @@ model Tutor {
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
 
-  categories        TutorCategory[]
+  tutorSubjects     TutorSubject[]
   availabilitySlots AvailabilitySlot[]
   reviews           Review[]           @relation("TutorReviews")
   booking           Booking[]          @relation("TutorBookings")

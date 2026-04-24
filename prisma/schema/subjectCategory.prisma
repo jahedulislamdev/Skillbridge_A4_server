@@ -1,8 +1,8 @@
 // subject category
-model Category {
-  id     String          @id @default(uuid())
-  name   String          @db.VarChar(50)
-  tutors TutorCategory[]
+model subjects {
+  id            String         @id @default(uuid())
+  name          String         @db.VarChar(50)
+  tutorSubjects TutorSubject[]
 
   @@map("subjectCategories")
 }
