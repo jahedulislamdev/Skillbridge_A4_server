@@ -27,7 +27,25 @@ const createReview = async (
 };
 const getReviews = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const result = await reviewService.getReviews(
+        const result = await reviewService.getReviews();
+
+        res.status(200).json({
+            success: true,
+            message: "review retreived successfully",
+            data: result,
+        });
+    } catch (err) {
+        next(err);
+    }
+};
+//* get review by booking
+const getReviewsByBooking = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+) => {
+    try {
+        const result = await reviewService.getReviewsByBooking(
             req.params.bookingId as string,
         );
 
@@ -107,6 +125,7 @@ const deleteReview = async (
 export const reviewController = {
     createReview,
     getReviews,
+    getReviewsByBooking,
     updateReview,
     deleteReview,
     getReviewById,

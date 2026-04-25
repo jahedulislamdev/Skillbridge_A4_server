@@ -53,9 +53,32 @@ const createReview = async (
     // student can review (1 student 1booking 1 review) when bookings compleated
     // studentId, bookingId need
 };
-
-//* get review
-const getReviews = async (bookingId: string) => {
+//* get all review
+const getReviews = async () => {
+    return await prisma.review.findMany({
+        include: {
+            student: {
+                select: {
+                    name: true,
+                    image: true,
+                },
+            },
+            tutor: {
+                select: {
+                    id: true,
+                    user: {
+                        select: {
+                            name: true,
+                            image: true,
+                        },
+                    },
+                },
+            },
+        },
+    });
+};
+//* get review by booking
+const getReviewsByBooking = async (bookingId: string) => {
     const booking = await prisma.booking.findUnique({
         where: { id: bookingId },
     });
@@ -63,7 +86,6 @@ const getReviews = async (bookingId: string) => {
         throw new Error("Booking not Found!");
     }
     return await prisma.review.findMany({
-        where: { bookingId },
         include: {
             student: {
                 select: {
@@ -160,8 +182,9 @@ const deleteReview = async (
 
 export const reviewService = {
     createReview,
-    getReviews,
+    getReviewsByBooking,
     updateReview,
     deleteReview,
     getReviewById,
+    getReviews,
 };

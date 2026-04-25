@@ -9,7 +9,8 @@ router.post(
     checkRole(UserRole.admin, UserRole.tutor, UserRole.user),
     reviewController.createReview,
 );
-router.get("/:bookingId", reviewController.getReviews);
+router.get("/", reviewController.getReviews);
+router.get("/:bookingId", reviewController.getReviewsByBooking);
 router.get("/:reviewId", reviewController.getReviewById);
 router.patch(
     "/:reviewId",
