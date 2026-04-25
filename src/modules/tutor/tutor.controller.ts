@@ -6,6 +6,16 @@ import { UserRole } from "../../types/enum/userRole";
 //* create tutor
 const createTutor = async (req: Request, res: Response, next: NextFunction) => {
     try {
+        const { bio, hourlyRate, subjectId } = req.body;
+        console.log(req.body);
+
+        if (!bio || !hourlyRate || !subjectId?.length) {
+            return res.status(400).json({
+                success: false,
+                message: "bio, hourlyRate and subjectIds are required",
+            });
+        }
+
         const result = await tutorService.createTutor(
             req.body,
             req.user?.id as string,
@@ -13,7 +23,7 @@ const createTutor = async (req: Request, res: Response, next: NextFunction) => {
 
         res.status(201).json({
             success: true,
-            message: "tutor created successfully",
+            message: "Tutor created successfully",
             data: result,
         });
     } catch (err) {

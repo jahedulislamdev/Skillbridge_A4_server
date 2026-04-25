@@ -9,11 +9,25 @@ const createTutor = async (data: TutorInput, userId: string) => {
     // console.log({ data, id: userId });
     const exist = await prisma.tutor.findUnique({ where: { userId } });
     if (exist) {
-        throw new Error("Cannot create duplicate tutor using same user ID");
+        throw new Error("Cannot create duplicate tutor using same userID");
     }
-    const allowData = buildTutorData(data);
+    const { subjectId, ...rest } = data;
+
     return await prisma.tutor.create({
-        data: { ...allowData, userId },
+        data: {
+            ...rest,
+            userId,
+            tutorSubjects: {
+                create: subjectId.map((id) => ({ categoryId: id })),
+            },
+        },
+        include: {
+            tutorSubjects: {
+                include: {
+                    subjects: true,
+                },
+            },
+        },
     });
 };
 
@@ -83,12 +97,18 @@ const getTutors = async (
                     image: true,
                 },
             },
+            tutorSubjects: {
+                select: {
+                    subjects: true,
+                },
+            },
             reviews: true,
             availabilitySlots: true,
             booking: true,
         },
+
         orderBy: {
-            createdAt: "asc",
+            createdAt: "desc",
         },
     });
     const total = await prisma.tutor.count({
@@ -141,6 +161,11 @@ const getTutorById = async (tutotId: string) => {
                             scheduledAt: true,
                         },
                     },
+                },
+            },
+            tutorSubjects: {
+                select: {
+                    subjects: true,
                 },
             },
         },
