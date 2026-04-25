@@ -49,10 +49,14 @@ const getSlots = async () => {
         include: {
             tutor: {
                 select: {
+                    id: true,
                     hourlyRate: true,
                     experienceYears: true,
-                    categories: true,
-                    availabilitySlots: true,
+                    tutorSubjects: {
+                        select: {
+                            subjects: true,
+                        },
+                    },
                     user: {
                         select: {
                             name: true,

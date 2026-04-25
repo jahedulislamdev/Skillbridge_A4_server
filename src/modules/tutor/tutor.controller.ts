@@ -6,10 +6,10 @@ import { UserRole } from "../../types/enum/userRole";
 //* create tutor
 const createTutor = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { bio, hourlyRate, subjectId } = req.body;
-        console.log(req.body);
+        const { bio, hourlyRate, subjectIds } = req.body;
+        // console.log(req.body);
 
-        if (!bio || !hourlyRate || !subjectId?.length) {
+        if (!bio || !hourlyRate || !subjectIds?.length) {
             return res.status(400).json({
                 success: false,
                 message: "bio, hourlyRate and subjectIds are required",

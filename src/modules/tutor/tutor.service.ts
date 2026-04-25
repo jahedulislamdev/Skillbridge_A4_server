@@ -11,14 +11,14 @@ const createTutor = async (data: TutorInput, userId: string) => {
     if (exist) {
         throw new Error("Cannot create duplicate tutor using same userID");
     }
-    const { subjectId, ...rest } = data;
+    const { subjectIds, ...rest } = data;
 
     return await prisma.tutor.create({
         data: {
             ...rest,
             userId,
             tutorSubjects: {
-                create: subjectId.map((id) => ({ categoryId: id })),
+                create: subjectIds.map((id) => ({ categoryId: id })),
             },
         },
         include: {

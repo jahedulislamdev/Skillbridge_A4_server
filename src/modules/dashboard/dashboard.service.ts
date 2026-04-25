@@ -8,7 +8,7 @@ const getDashboardStats = async () => {
         users,
         tutors,
         admins,
-        categories,
+        subjects,
         bookings,
         slots,
         reviews,
@@ -22,7 +22,7 @@ const getDashboardStats = async () => {
         prisma.user.count(),
         prisma.user.count({ where: { role: UserRole.tutor } }),
         prisma.user.count({ where: { role: UserRole.admin } }),
-        prisma.category.count(),
+        prisma.subjects.count(),
         prisma.booking.count(),
         prisma.availabilitySlot.count(),
         prisma.review.count(),
@@ -58,8 +58,8 @@ const getDashboardStats = async () => {
             available: availableSlots,
             booked: bookedSlots,
         },
-        categories: {
-            total: categories,
+        subjects: {
+            total: subjects,
         },
         reviews: {
             total: reviews,

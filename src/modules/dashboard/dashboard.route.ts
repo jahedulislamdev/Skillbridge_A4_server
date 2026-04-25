@@ -4,9 +4,5 @@ import { checkRole } from "../../middleware/requireAuth";
 import { UserRole } from "../../types/enum/userRole";
 
 const router = Router();
-router.get(
-    "/stats",
-    checkRole(UserRole.admin),
-    dashboardController.getDashboardStats,
-);
+router.get("/stats", dashboardController.getDashboardStats);
 export const dashboardRoute = router;
