@@ -62,6 +62,18 @@ const getTutors = async (
                         },
                     },
                 },
+                {
+                    tutorSubjects: {
+                        some: {
+                            subjects: {
+                                name: {
+                                    contains: search,
+                                    mode: "insensitive",
+                                },
+                            },
+                        },
+                    },
+                },
             ],
         });
     }
