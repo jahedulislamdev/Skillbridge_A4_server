@@ -3,12 +3,13 @@ import { UserRole } from "../../types/enum/userRole";
 
 //* create subject category
 const createSubject = async (categoryName: string, role: UserRole) => {
-    if (!categoryName && categoryName.trim() === "") {
-        throw new Error("Category name is required");
-    }
     if (role !== UserRole.admin) {
         throw new Error("unauthorized");
     }
+    if (!categoryName && categoryName.trim() === "") {
+        throw new Error("Category name is required");
+    }
+
     const existing = await prisma.subjects.findFirst({
         where: {
             name: categoryName,

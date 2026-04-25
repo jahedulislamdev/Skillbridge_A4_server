@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { checkRole } from "../../middleware/requireAuth";
-import { subjectController } from "./categories.controller";
+import { subjectController } from "./subjects.controller";
 import { UserRole } from "../../types/enum/userRole";
 
 const router = Router();
@@ -22,4 +22,4 @@ router.delete(
     checkRole(UserRole.admin),
     subjectController.deleteSubject,
 );
-export const categoryRouter = router;
+export const subjectsRouter = router;

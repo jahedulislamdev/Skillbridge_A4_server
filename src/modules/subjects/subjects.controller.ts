@@ -1,5 +1,5 @@
 import { UserRole } from "../../types/enum/userRole";
-import { subjectService } from "./categories.service";
+import { subjectService } from "./subjects.service";
 import { NextFunction, Request, Response } from "express";
 
 const createSubject = async (
