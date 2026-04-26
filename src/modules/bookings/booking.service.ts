@@ -133,6 +133,9 @@ const updateBooking = async (
 
     //* student can change status "CANCELLED" only.
     if (isStudentOfThisBooking) {
+        if (existBooking.status === BookingStatus.CANCELLED) {
+            throw new Error("Booking already canceled");
+        }
         // prevent changes except cancel status
         if (status !== BookingStatus.CANCELLED) {
             throw new Error("Student can only cancel booking");

@@ -2,6 +2,10 @@ import { UserWhereInput } from "../../../generated/prisma/models";
 import { UserRole } from "../../types/enum/userRole";
 import { prisma } from "../../lib/prisma";
 
+interface UserProps {
+    name: string;
+    image: string;
+}
 const getUsers = async (
     role: UserRole,
     page: number,
@@ -55,6 +59,33 @@ const getUsers = async (
     };
 };
 
+const updateUser = async (
+    loggedInUserId: string,
+    targetUserId: string,
+    role: UserRole,
+    data: UserProps,
+) => {
+    const user = await prisma.user.findUnique({
+        where: {
+            id: targetUserId,
+        },
+    });
+    if (!user) {
+        throw new Error("user is not exist in your record!");
+    }
+    if (role !== UserRole.admin && user.id !== loggedInUserId) {
+        throw new Error("You have no access to update others profile");
+    }
+    const allowedData = {
+        name: data.name,
+        image: data.image,
+    };
+    return await prisma.user.update({
+        where: { id: targetUserId },
+        data: allowedData,
+    });
+};
 export const userService = {
     getUsers,
+    updateUser,
 };
