@@ -30,7 +30,7 @@ const getUsers = async (req: Request, res: Response, next: NextFunction) => {
 };
 const updateUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        console.log(req.body);
+        // console.log(req.body);
 
         const result = await userService.updateUser(
             req.user?.id as string,

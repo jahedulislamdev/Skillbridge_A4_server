@@ -11,7 +11,8 @@ router.post(
     SlotController.createSlot,
 );
 router.get("/", SlotController.getSlots);
-router.get("/:slotId", checkRole(), SlotController.getSlots);
+router.get("/:slotId", SlotController.getSlots);
+router.get("/tutor/:tutorId", SlotController.getSlotsByTutorId);
 router.patch(
     "/:slotId",
     checkRole(UserRole.admin, UserRole.tutor),

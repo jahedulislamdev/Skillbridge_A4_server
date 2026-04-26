@@ -80,6 +80,13 @@ const getSlotById = async (slotId: string) => {
     return slot;
 };
 
+const getSlotsByTutorId = async (tutorId: string) => {
+    await prisma.availabilitySlot.findFirstOrThrow({ where: { tutorId } });
+    return await prisma.availabilitySlot.findMany({
+        where: { tutorId },
+    });
+};
+
 //* update slots
 const updateSlot = async (
     slotId: string,
@@ -129,6 +136,7 @@ const deleteSlot = async (slotId: string, userId: string, role: UserRole) => {
     return await prisma.availabilitySlot.delete({ where: { id: slotId } });
 };
 export const slotsService = {
+    getSlotsByTutorId,
     createslot,
     getSlots,
     updateSlot,

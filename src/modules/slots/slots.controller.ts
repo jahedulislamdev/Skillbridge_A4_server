@@ -33,6 +33,24 @@ const getSlots = async (req: Request, res: Response, next: NextFunction) => {
         next(err);
     }
 };
+const getSlotsByTutorId = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+) => {
+    try {
+        const result = await slotsService.getSlotsByTutorId(
+            req.params.tutorId as string,
+        );
+        res.status(200).json({
+            success: true,
+            message: "slots retrives successfully",
+            data: result,
+        });
+    } catch (err) {
+        next(err);
+    }
+};
 const getSlotById = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const result = await slotsService.getSlotById(
@@ -91,4 +109,5 @@ export const SlotController = {
     getSlotById,
     updateSlot,
     deleteSlot,
+    getSlotsByTutorId,
 };
