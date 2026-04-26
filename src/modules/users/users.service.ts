@@ -59,6 +59,19 @@ const getUsers = async (
     };
 };
 
+const getUsreById = async (userId: string) => {
+    const user = await prisma.user.findUnique({
+        where: { id: userId },
+        include: {
+            tutorProfile: { select: { id: true } },
+        },
+    });
+    if (!user) {
+        throw new Error("user is not exist!");
+    }
+    return user;
+};
+
 const updateUser = async (
     loggedInUserId: string,
     targetUserId: string,
@@ -88,4 +101,5 @@ const updateUser = async (
 export const userService = {
     getUsers,
     updateUser,
+    getUsreById,
 };

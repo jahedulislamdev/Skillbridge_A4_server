@@ -28,6 +28,20 @@ const getUsers = async (req: Request, res: Response, next: NextFunction) => {
         next(err);
     }
 };
+const getUserById = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const result = await userService.getUsreById(
+            req.params.userId as string,
+        );
+        res.status(200).json({
+            success: true,
+            message: "user retrieved successfully",
+            data: result,
+        });
+    } catch (err) {
+        next(err);
+    }
+};
 const updateUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
         // console.log(req.body);
@@ -52,4 +66,5 @@ const updateUser = async (req: Request, res: Response, next: NextFunction) => {
 export const userControler = {
     getUsers,
     updateUser,
+    getUserById,
 };

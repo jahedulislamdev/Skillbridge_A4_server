@@ -5,6 +5,7 @@ import { UserRole } from "../../types/enum/userRole";
 
 const router = Router();
 router.get("/", checkRole(UserRole.admin), userControler.getUsers);
+router.get("/:userId", userControler.getUserById);
 router.patch(
     "/:id",
     checkRole(UserRole.admin, UserRole.tutor, UserRole.user),

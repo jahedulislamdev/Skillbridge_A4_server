@@ -81,7 +81,10 @@ const getSlotById = async (slotId: string) => {
 };
 
 const getSlotsByTutorId = async (tutorId: string) => {
-    await prisma.availabilitySlot.findFirstOrThrow({ where: { tutorId } });
+    const res = await prisma.availabilitySlot.findFirst({ where: { tutorId } });
+    if (!res) {
+        throw new Error("Tutor have no available slot");
+    }
     return await prisma.availabilitySlot.findMany({
         where: { tutorId },
     });
@@ -129,6 +132,11 @@ const deleteSlot = async (slotId: string, userId: string, role: UserRole) => {
     if (!tutor) {
         throw new Error("Unauthorized");
     }
+    const bookings = await prisma.booking.findFirst({ where: { slotId } });
+    if (bookings) {
+        throw new Error("Slot already booked, cannot delete");
+    }
+
     if (role !== UserRole.admin && exist.tutorId !== tutor.id) {
         throw new Error("You have no access to delete others slot");
     }
