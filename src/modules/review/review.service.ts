@@ -77,6 +77,11 @@ const getReviews = async () => {
         },
     });
 };
+
+const getReviewByTutorId = async (tutorId: string) => {
+    return await prisma.review.findMany({ where: { tutorId } });
+};
+
 //* get review by booking
 const getReviewsByBooking = async (bookingId: string) => {
     const booking = await prisma.booking.findUnique({
@@ -181,6 +186,7 @@ const deleteReview = async (
 };
 
 export const reviewService = {
+    getReviewByTutorId,
     createReview,
     getReviewsByBooking,
     updateReview,

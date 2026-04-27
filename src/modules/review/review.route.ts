@@ -12,6 +12,7 @@ router.post(
 router.get("/", reviewController.getReviews);
 router.get("/:bookingId", reviewController.getReviewsByBooking);
 router.get("/:reviewId", reviewController.getReviewById);
+router.get("/tutor/:tutorId", reviewController.getReviewByTutorId);
 router.patch(
     "/:reviewId",
     checkRole(UserRole.admin, UserRole.user, UserRole.tutor),

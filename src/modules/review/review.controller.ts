@@ -58,6 +58,25 @@ const getReviewsByBooking = async (
         next(err);
     }
 };
+const getReviewByTutorId = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+) => {
+    try {
+        const result = await reviewService.getReviewByTutorId(
+            req.params.tutorId as string,
+        );
+
+        res.status(200).json({
+            success: true,
+            message: "review retreived successfully",
+            data: result,
+        });
+    } catch (err) {
+        next(err);
+    }
+};
 const getReviewById = async (
     req: Request,
     res: Response,
@@ -129,4 +148,5 @@ export const reviewController = {
     updateReview,
     deleteReview,
     getReviewById,
+    getReviewByTutorId,
 };

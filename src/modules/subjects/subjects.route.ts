@@ -18,7 +18,7 @@ router.patch(
     subjectController.updateSubject,
 );
 router.delete(
-    "/:categoryId",
+    "/:subjectId",
     checkRole(UserRole.admin),
     subjectController.deleteSubject,
 );

@@ -6,17 +6,17 @@ import { userService } from "./users.service";
 const getUsers = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { limit, page, skip } = buildPagination(req.query);
-        const { searchValue } = req.query;
-        const search =
-            typeof searchValue === "string" && searchValue.trim() !== ""
-                ? searchValue
+        const { search } = req.query;
+        const searchValue =
+            typeof search === "string" && search.trim() !== ""
+                ? search
                 : undefined;
         const result = await userService.getUsers(
             req.user?.role as UserRole,
             page,
             limit,
             skip,
-            search,
+            searchValue,
         );
 
         res.status(200).json({

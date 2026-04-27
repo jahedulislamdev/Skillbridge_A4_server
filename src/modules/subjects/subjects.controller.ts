@@ -83,8 +83,10 @@ const deleteSubject = async (
     next: NextFunction,
 ) => {
     try {
+        console.log("subject id form controller: ", req.params.subjectId);
+
         const result = await subjectService.deleteSubject(
-            req.params.categoryId as string,
+            req.params.subjectId as string,
             req.user?.role as UserRole,
         );
         res.status(200).json({

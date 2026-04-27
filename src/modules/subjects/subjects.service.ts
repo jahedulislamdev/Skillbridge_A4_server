@@ -1,47 +1,47 @@
 import { prisma } from "../../lib/prisma";
 import { UserRole } from "../../types/enum/userRole";
 
-//* create subject category
-const createSubject = async (categoryName: string, role: UserRole) => {
+//* create subject subject
+const createSubject = async (subjectName: string, role: UserRole) => {
     if (role !== UserRole.admin) {
         throw new Error("unauthorized");
     }
-    if (!categoryName && categoryName.trim() === "") {
-        throw new Error("Category name is required");
+    if (!subjectName && subjectName.trim() === "") {
+        throw new Error("subject name is required");
     }
 
     const existing = await prisma.subjects.findFirst({
         where: {
-            name: categoryName,
+            name: subjectName,
         },
     });
     if (existing) {
-        throw new Error("Category already exists");
+        throw new Error("subject already exists");
     }
-    return await prisma.subjects.create({ data: { name: categoryName } });
+    return await prisma.subjects.create({ data: { name: subjectName } });
 };
 
-//* get subject category
+//* get subject subject
 const getSubjects = async () => {
     return await prisma.subjects.findMany();
 };
 
-//* get subject category by id
-const getSubjectById = async (categoryId: string) => {
+//* get subject subject by id
+const getSubjectById = async (subjectId: string) => {
     const result = await prisma.subjects.findUnique({
         where: {
-            id: categoryId,
+            id: subjectId,
         },
     });
     if (!result) {
-        throw new Error("category not found!");
+        throw new Error("subject not found!");
     }
     return result;
 };
 
-//* update subject category
+//* update subject subject
 const updateSubject = async (
-    categoryId: string,
+    subjectId: string,
     updatedName: string,
     role: UserRole,
 ) => {
@@ -50,15 +50,15 @@ const updateSubject = async (
     }
     const existing = await prisma.subjects.findUnique({
         where: {
-            id: categoryId,
+            id: subjectId,
         },
     });
     if (!existing) {
-        throw new Error("Category not found");
+        throw new Error("subject not found");
     }
     return await prisma.subjects.update({
         where: {
-            id: categoryId,
+            id: subjectId,
         },
         data: {
             name: updatedName,
@@ -66,22 +66,33 @@ const updateSubject = async (
     });
 };
 
-//* delee subject category
-const deleteSubject = async (categoryId: string, role: UserRole) => {
+//* delee subject subject
+const deleteSubject = async (subjectId: string, role: UserRole) => {
     if (role !== UserRole.admin) {
         throw new Error("unauthorized");
     }
     const existing = await prisma.subjects.findUnique({
         where: {
-            id: categoryId,
+            id: subjectId,
         },
     });
     if (!existing) {
-        throw new Error("Category not found");
+        throw new Error("subject not found");
     }
+    console.log("subject it form service:", subjectId);
+
+    const tutorsSubject = await prisma.tutorSubject.findFirst({
+        where: { subjects: { id: subjectId } },
+    });
+    if (tutorsSubject) {
+        throw new Error(
+            "This subject is assigned to a tutor and cannot be deleted.",
+        );
+    }
+
     return await prisma.subjects.delete({
         where: {
-            id: categoryId,
+            id: subjectId,
         },
     });
 };
