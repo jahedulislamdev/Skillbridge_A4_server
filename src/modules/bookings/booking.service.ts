@@ -94,6 +94,17 @@ const getBookingById = async (
     return booking;
 };
 
+//* get booking by tutor id
+const getBookingByTutorId = async (tutorId: string) => {
+    const tutor = await prisma.booking.findFirst({
+        where: { tutorId },
+    });
+    if (!tutor) {
+        throw new Error("No Booking Found!");
+    }
+    return await prisma.booking.findMany({ where: { tutorId } });
+};
+
 //* update booking
 const updateBooking = async (
     bookingId: string,
@@ -180,4 +191,5 @@ export const bookingService = {
     updateBooking,
     deleteBooking,
     getBookingById,
+    getBookingByTutorId,
 };

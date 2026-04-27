@@ -65,6 +65,26 @@ const getBookingById = async (
     }
 };
 
+//* get booking by tutor id
+const getBookingByTutorId = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+) => {
+    try {
+        const result = await bookingService.getBookingByTutorId(
+            req.params.tutorId as string,
+        );
+        res.status(200).json({
+            success: true,
+            message: "booking retrieved successfully",
+            data: result,
+        });
+    } catch (err) {
+        next(err);
+    }
+};
+
 //* update Bookings
 const updateBookings = async (
     req: Request,
@@ -117,4 +137,5 @@ export const bookingController = {
     getBookingById,
     updateBookings,
     deleteBookings,
+    getBookingByTutorId,
 };
