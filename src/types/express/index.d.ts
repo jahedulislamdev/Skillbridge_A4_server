@@ -8,6 +8,7 @@ declare global {
                 email: string;
                 role: UserRole;
                 emailVarified: boolean;
+                isBanned: boolean;
             };
         }
     }

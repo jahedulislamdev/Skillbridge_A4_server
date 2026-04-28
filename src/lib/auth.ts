@@ -32,9 +32,24 @@ export const auth = betterAuth({
                 required: false,
                 defaultValue: "USER",
             },
+            isBanned: {
+                type: "string",
+                required: false,
+                defaultValue: false,
+            },
         },
     },
-
+    callbacks: {
+        async session({ session, user }: { session: any; user: any }) {
+            return {
+                ...session,
+                user: {
+                    ...session.user,
+                    isBanned: user.isBanned ?? false,
+                },
+            };
+        },
+    },
     emailAndPassword: {
         enabled: true,
         autoSignIn: false,

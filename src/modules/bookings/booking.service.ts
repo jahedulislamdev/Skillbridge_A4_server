@@ -57,7 +57,14 @@ const createBooking = async (
 //* get bookigs
 const getBookings = async (userId: string, role: UserRole) => {
     if (role === UserRole.admin) {
-        return await prisma.booking.findMany();
+        return await prisma.booking.findMany({
+            include: {
+                student: { select: { email: true, role: true } },
+                tutor: {
+                    select: { user: { select: { email: true, name: true } } },
+                },
+            },
+        });
     }
     const studentBookings = await prisma.booking.findMany({
         where: {

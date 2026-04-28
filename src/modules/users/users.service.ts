@@ -3,8 +3,11 @@ import { UserRole } from "../../types/enum/userRole";
 import { prisma } from "../../lib/prisma";
 
 interface UserProps {
-    name: string;
-    image: string;
+    name?: string;
+    image?: string;
+    role?: string;
+    emailVerified?: boolean;
+    isBanned?: boolean;
 }
 const getUsers = async (
     role: UserRole,
@@ -89,13 +92,23 @@ const updateUser = async (
     if (role !== UserRole.admin && user.id !== loggedInUserId) {
         throw new Error("You have no access to update others profile");
     }
-    const allowedData = {
+
+    // Base fields user can update
+    const updatedData: any = {
         name: data.name,
         image: data.image,
     };
+
+    // Extra fields (only admin can update)
+    if (role === UserRole.admin) {
+        updatedData.emailVerified = data.emailVerified;
+        updatedData.role = data.role;
+        updatedData.isBanned = data.isBanned;
+    }
+
     return await prisma.user.update({
         where: { id: targetUserId },
-        data: allowedData,
+        data: updatedData,
     });
 };
 export const userService = {
