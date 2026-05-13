@@ -1,4 +1,5 @@
-import { DayOfWeek } from "../../../generated/prisma/enums";
+// import { DayOfWeek } from "../../../generated/prisma/enums";
+import { DayOfWeek } from "../../generated/prisma/enums";
 import { timevalidator } from "../../helper/timeFormatter";
 import { prisma } from "../../lib/prisma";
 import { UserRole } from "../../types/enum/userRole";

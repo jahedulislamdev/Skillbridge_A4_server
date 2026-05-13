@@ -1,6 +1,7 @@
-import { UserWhereInput } from "../../../generated/prisma/models";
+// import { UserWhereInput } from "../../../generated/prisma/models";
 import { UserRole } from "../../types/enum/userRole";
 import { prisma } from "../../lib/prisma";
+import { UserWhereInput } from "../../generated/prisma/models";
 
 interface UserProps {
     name?: string;

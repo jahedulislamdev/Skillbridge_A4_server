@@ -1,7 +1,8 @@
 import { calculateBookingPrice } from "../../helper/getBookingPrice";
-import { BookingStatus } from "../../../generated/prisma/enums";
+// import { BookingStatus } from "../../../generated/prisma/enums";
 import { UserRole } from "../../types/enum/userRole";
 import { prisma } from "../../lib/prisma";
+import { BookingStatus } from "../../generated/prisma/enums";
 
 //* create bookig (user(student) can booking available slots)
 const createBooking = async (
@@ -14,7 +15,7 @@ const createBooking = async (
     if (!user) {
         throw new Error("User Not Found!");
     }
-    const result = await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx: any) => {
         const freshSlot = await tx.availabilitySlot.findUnique({
             where: { id: slotId },
             include: { tutor: true },

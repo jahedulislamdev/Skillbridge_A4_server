@@ -1,4 +1,5 @@
-import { BookingStatus } from "../../../generated/prisma/enums";
+// import { BookingStatus } from "../../../generated/prisma/enums";
+import { BookingStatus } from "../../generated/prisma/enums";
 import { updateTutorRating } from "../../helper/updateTutorRating";
 import { prisma } from "../../lib/prisma";
 import { UserRole } from "../../types/enum/userRole";
@@ -24,7 +25,7 @@ const createReview = async (
             "You cannot submit a review before completing your session",
         );
     }
-    return await prisma.$transaction(async (tx) => {
+    return await prisma.$transaction(async (tx: any) => {
         const existingReview = await tx.review.findFirst({
             where: {
                 bookingId,
@@ -149,7 +150,7 @@ const updateReview = async (
     if (rating < 1 || rating > 5) {
         throw new Error("Rating must be between 1 and 5");
     }
-    return await prisma.$transaction(async (tx) => {
+    return await prisma.$transaction(async (tx: any) => {
         const result = await tx.review.update({
             where: { id: reviewId },
             data: {
@@ -178,7 +179,7 @@ const deleteReview = async (
     if (role !== UserRole.admin && review.studentId !== userId) {
         throw new Error("You are not allow to delete this review");
     }
-    return await prisma.$transaction(async (tx) => {
+    return await prisma.$transaction(async (tx: any) => {
         const result = await tx.review.delete({ where: { id: reviewId } });
         await updateTutorRating(tx, review.tutorId);
         return result;

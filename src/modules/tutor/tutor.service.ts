@@ -1,8 +1,9 @@
-import { TutorWhereInput } from "../../../generated/prisma/models";
+// import { TutorWhereInput } from "../../../generated/prisma/models";
 import buildTutorData from "../../helper/buildTutorData";
 import { TutorInput } from "../../types/general/tutor";
 import { UserRole } from "../../types/enum/userRole";
 import { prisma } from "../../lib/prisma";
+import { TutorWhereInput } from "../../generated/prisma/models";
 
 //* create tutor profile
 const createTutor = async (data: TutorInput, userId: string) => {

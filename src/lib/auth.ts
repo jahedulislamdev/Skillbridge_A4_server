@@ -1,10 +1,14 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
-import { prisma } from "./prisma";
-import appConfig from "../config";
+import { oAuthProxy } from "better-auth/plugins";
 import nodemailer from "nodemailer";
 
-//* SMTP TRANSPORT (Gmail)
+import appConfig from "../config/index.js";
+import { prisma } from "./prisma";
+
+// ======================================================
+// SMTP TRANSPORT (GMAIL)
+// ======================================================
 
 const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
@@ -16,7 +20,106 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-//* AUTH CONFIG
+// ======================================================
+// EMAIL TEMPLATE
+// ======================================================
+
+const verificationEmailTemplate = (name: string, verificationUrl: string) => `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Email Verification</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f7f6;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+      background: #ffffff;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .header {
+      background: #0056b3;
+      color: #ffffff;
+      padding: 25px;
+      text-align: center;
+    }
+
+    .content {
+      padding: 30px;
+      line-height: 1.6;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 12px 20px;
+      background: #0056b3;
+      color: #ffffff !important;
+      text-decoration: none;
+      border-radius: 6px;
+      margin-top: 20px;
+    }
+
+    .footer {
+      font-size: 12px;
+      text-align: center;
+      padding: 15px;
+      color: #777777;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <div class="header">
+      <h2>Skillbridge</h2>
+    </div>
+
+    <div class="content">
+      <h3>Hello ${name || "User"},</h3>
+
+      <p>
+        Thanks for joining Skillbridge.
+        Please verify your email to activate your account.
+      </p>
+
+      <a href="${verificationUrl}" class="btn">
+        Verify Account
+      </a>
+
+      <p style="margin-top:20px; font-size:12px;">
+        If the button doesn't work, copy this link:
+        <br />
+        ${verificationUrl}
+      </p>
+
+      <p style="margin-top:20px;">
+        If you didn’t request this, ignore this email.
+      </p>
+    </div>
+
+    <div class="footer">
+      © ${new Date().getFullYear()} Skillbridge
+    </div>
+
+  </div>
+</body>
+</html>
+`;
+
+// ======================================================
+// AUTH CONFIG
+// ======================================================
 
 export const auth = betterAuth({
     database: prismaAdapter(prisma, {
@@ -25,6 +128,10 @@ export const auth = betterAuth({
 
     trustedOrigins: [appConfig.app_url || "http://localhost:3000"],
 
+    // ==================================================
+    // USER CONFIG
+    // ==================================================
+
     user: {
         additionalFields: {
             role: {
@@ -32,29 +139,46 @@ export const auth = betterAuth({
                 required: false,
                 defaultValue: "USER",
             },
+
             isBanned: {
-                type: "string",
+                type: "boolean",
                 required: false,
                 defaultValue: false,
             },
         },
     },
+
+    // ==================================================
+    // SESSION CALLBACKS
+    // ==================================================
+
     callbacks: {
         async session({ session, user }: { session: any; user: any }) {
             return {
                 ...session,
+
                 user: {
                     ...session.user,
+                    role: user.role,
                     isBanned: user.isBanned ?? false,
                 },
             };
         },
     },
+
+    // ==================================================
+    // EMAIL & PASSWORD AUTH
+    // ==================================================
+
     emailAndPassword: {
         enabled: true,
         autoSignIn: false,
         requireEmailVerification: true,
     },
+
+    // ==================================================
+    // SOCIAL PROVIDERS
+    // ==================================================
 
     socialProviders: {
         google: {
@@ -65,73 +189,58 @@ export const auth = betterAuth({
         },
     },
 
-    //* EMAIL VERIFICATION
+    // ==================================================
+    // ADVANCED COOKIE CONFIG
+    // ==================================================
+
+    advanced: {
+        cookies: {
+            session_token: {
+                name: "sb_session_token",
+
+                attributes: {
+                    httpOnly: true,
+                    secure: true,
+                    sameSite: "none",
+                    partitioned: true,
+                },
+            },
+
+            state: {
+                name: "sb_state",
+
+                attributes: {
+                    httpOnly: true,
+                    secure: true,
+                    sameSite: "none",
+                    partitioned: true,
+                },
+            },
+        },
+    },
+
+    // ==================================================
+    // EMAIL VERIFICATION
+    // ==================================================
 
     emailVerification: {
         sendOnSignUp: true,
         autoSignInAfterVerification: true,
 
-        sendVerificationEmail: async ({ user, url }) => {
+        sendVerificationEmail: async ({
+            user,
+            url,
+        }: {
+            user: any;
+            url: string;
+        }) => {
             try {
-                const verificationUrl = url;
-
                 await transporter.sendMail({
                     from: `"Skillbridge Team" <${appConfig.nm_user}>`,
                     to: user.email,
                     subject: "Verify your Skillbridge account",
 
-                    html: `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8" />
-  <title>Email Verification</title>
-  <style>
-    body { font-family: Arial, sans-serif; background:#f4f7f6; margin:0; }
-    .container { max-width:600px; margin:40px auto; background:#fff; border-radius:10px; overflow:hidden; }
-    .header { background:#0056b3; color:#fff; padding:25px; text-align:center; }
-    .content { padding:30px; line-height:1.6; }
-    .btn {
-      display:inline-block;
-      padding:12px 20px;
-      background:#0056b3;
-      color:#fff;
-      text-decoration:none;
-      border-radius:6px;
-      margin-top:20px;
-    }
-    .footer { font-size:12px; text-align:center; padding:15px; color:#777; }
-  </style>
-</head>
-<body>
-  <div class="container">
-
-    <div class="header">
-      <h2>Skillbridge</h2>
-    </div>
-
-    <div class="content">
-      <h3>Hello ${user.name || "User"},</h3>
-      <p>Thanks for joining Skillbridge. Please verify your email to activate your account.</p>
-
-      <a href="${verificationUrl}" class="btn">Verify Account</a>
-
-      <p style="margin-top:20px; font-size:12px;">
-        If button doesn't work, copy this link:<br/>
-        ${verificationUrl}
-      </p>
-
-      <p style="margin-top:20px;">If you didn’t request this, ignore this email.</p>
-    </div>
-
-    <div class="footer">
-      © ${new Date().getFullYear()} Skillbridge
-    </div>
-
-  </div>
-</body>
-</html>
-                    `,
+                    html: verificationEmailTemplate(user.name, url),
                 });
             } catch (error) {
                 console.error("Email verification error:", error);
@@ -139,4 +248,10 @@ export const auth = betterAuth({
             }
         },
     },
+
+    // ==================================================
+    // PLUGINS
+    // ==================================================
+
+    plugins: [oAuthProxy()],
 });

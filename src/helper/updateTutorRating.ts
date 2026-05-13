@@ -1,4 +1,6 @@
-import { Prisma } from "../../generated/prisma/client";
+// import { Prisma } from "../../generated/prisma/client";
+
+import { Prisma } from "../generated/prisma/client";
 
 export const updateTutorRating = async (
     tx: Prisma.TransactionClient,
