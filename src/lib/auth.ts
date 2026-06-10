@@ -125,8 +125,8 @@ export const auth = betterAuth({
     database: prismaAdapter(prisma, {
         provider: "postgresql",
     }),
-
-    trustedOrigins: [appConfig.app_url || "http://localhost:3000"],
+    baseURL: appConfig.app_url as string,
+    trustedOrigins: [appConfig.app_url as string],
 
     // ==================================================
     // USER CONFIG
@@ -194,10 +194,12 @@ export const auth = betterAuth({
     // ==================================================
 
     advanced: {
+        crossSubDomainCookies: {
+            enabled: true,
+        },
         cookies: {
             session_token: {
-                name: "sb_session_token",
-
+                name: "session_token", // Force this exact name
                 attributes: {
                     httpOnly: true,
                     secure: true,
@@ -205,10 +207,8 @@ export const auth = betterAuth({
                     partitioned: true,
                 },
             },
-
             state: {
-                name: "sb_state",
-
+                name: "session_token", // Force this exact name
                 attributes: {
                     httpOnly: true,
                     secure: true,

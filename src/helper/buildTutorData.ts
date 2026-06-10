@@ -1,6 +1,7 @@
+import { UserRole } from "../types/enum/userRole";
 import { TutorInput } from "../types/general/tutor";
 
-export default function buildTutorData(data: TutorInput) {
+export default function buildTutorData(data: TutorInput, role: UserRole) {
     const allowData: any = {};
 
     if (data.bio !== undefined) {
@@ -13,6 +14,11 @@ export default function buildTutorData(data: TutorInput) {
 
     if (data.experienceYears !== undefined) {
         allowData.experienceYears = data.experienceYears;
+    }
+
+    // Only admin can update status
+    if (role === "ADMIN" && data.status !== undefined) {
+        allowData.status = data.status;
     }
 
     return allowData;

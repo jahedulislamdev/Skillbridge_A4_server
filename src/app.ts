@@ -1,7 +1,7 @@
+import express, { Application, Request, Response } from "express";
 import { toNodeHandler } from "better-auth/node";
 import { auth } from "./lib/auth";
 import appConfig from "./config/index.js";
-import express, { Application, Request, Response } from "express";
 import cors from "cors";
 import { tutorRoute } from "./modules/tutor/tutor.route";
 import { errorHandler } from "./middleware/errorHandler";
@@ -14,11 +14,16 @@ import { userRouter } from "./modules/users/users.route";
 
 const app: Application = express();
 
+app.use(
+    cors({
+        origin: appConfig.app_url,
+        credentials: true,
+    }),
+);
+app.all("/api/auth/{*any}", toNodeHandler(auth));
 app.use(express.json());
-app.use(cors({ origin: appConfig.app_url, credentials: true }));
 
 // routes
-app.all("/api/auth/{*any}", toNodeHandler(auth));
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/tutors", tutorRoute);
 app.use("/api/v1/subjects", subjectsRouter);
