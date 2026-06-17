@@ -43,13 +43,13 @@ const getTutors = async (
     priceMin: number | undefined,
     priceMax: number | undefined,
 ) => {
-    console.log("query params from service : ", {
-        search,
-        rating,
-        page,
-        limit,
-        skip,
-    });
+    // console.log("query params from service : ", {
+    //     search,
+    //     rating,
+    //     page,
+    //     limit,
+    //     skip,
+    // });
 
     const addConditon: TutorWhereInput[] = [];
     if (search) {
@@ -196,7 +196,7 @@ const updateTutor = async (
     role: UserRole,
     updatedData: TutorInput,
 ) => {
-    console.log(updatedData);
+    // console.log(updatedData);
     const existValidTutor = await prisma.tutor.findUnique({
         where: { id: tutorId },
     });
@@ -209,7 +209,7 @@ const updateTutor = async (
     }
     // send only allow data to update
     const allowData = buildTutorData(updatedData, role);
-    console.log(allowData);
+    // console.log(allowData);
     const updatedTutor = await prisma.tutor.update({
         where: { id: tutorId },
         data: allowData,

@@ -7,12 +7,16 @@ export const updateTutorRating = async (
     tutorId: string,
 ) => {
     const agg = await tx.review.aggregate({
-        where: { id: tutorId },
+        where: { tutorId },
         _avg: { rating: true },
         _count: { rating: true },
     });
     await tx.tutor.update({
-        where: { id: tutorId },
-        data: { averageRating: Number(agg._avg.rating) || 0 },
+        where: {
+            id: tutorId,
+        },
+        data: {
+            averageRating: agg._avg.rating ?? 0,
+        },
     });
 };
