@@ -79,7 +79,7 @@ const deleteSubject = async (subjectId: string, role: UserRole) => {
     if (!existing) {
         throw new Error("subject not found");
     }
-    console.log("subject it form service:", subjectId);
+    // console.log("subject it form service:", subjectId);
 
     const tutorsSubject = await prisma.tutorSubject.findFirst({
         where: { subjects: { id: subjectId } },

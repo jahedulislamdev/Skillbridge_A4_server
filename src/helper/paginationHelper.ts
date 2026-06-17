@@ -7,7 +7,7 @@ export default function buildPagination(options: Pagination): PaginationResult {
     const limit = Number(options.limit) || 10;
     const skip = (page - 1) * limit;
 
-    console.log(page, limit, skip);
+    // console.log(page, limit, skip);
 
     return {
         page,

@@ -85,6 +85,7 @@ const getSlots = async (
         skip,
         where: {
             AND: andCondition,
+            isBooked: false,
         },
         include: {
             tutor: {
