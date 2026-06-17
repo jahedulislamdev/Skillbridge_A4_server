@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { slotsService } from "./slots.service";
 import { UserRole } from "../../types/enum/userRole";
+import buildPagination from "../../helper/paginationHelper";
 
 const createSlot = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -23,7 +24,20 @@ const createSlot = async (req: Request, res: Response, next: NextFunction) => {
 };
 const getSlots = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const result = await slotsService.getSlots();
+        const { search } = req.query;
+        const searchParams =
+            typeof search === "string" && search.trim() !== ""
+                ? search.trim()
+                : undefined;
+        //* page limit and skiped data
+        const { page, limit, skip } = buildPagination(req.query);
+
+        const result = await slotsService.getSlots(
+            searchParams,
+            page,
+            limit,
+            skip,
+        );
         res.status(200).json({
             success: true,
             message: "slots retrives successfully",

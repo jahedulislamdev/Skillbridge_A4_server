@@ -3,7 +3,7 @@ import { DayOfWeek } from "../../generated/prisma/enums";
 import { timevalidator } from "../../helper/timeFormatter";
 import { prisma } from "../../lib/prisma";
 import { UserRole } from "../../types/enum/userRole";
-
+import { AvailabilitySlotWhereInput } from "../../generated/prisma/models";
 //* create new slot
 const createslot = async (
     userId: string,
@@ -45,8 +45,47 @@ const createslot = async (
 };
 
 //* everyone can get slots
-const getSlots = async () => {
-    return await prisma.availabilitySlot.findMany({
+const getSlots = async (
+    search: string | undefined,
+    page: number,
+    limit: number,
+    skip: number,
+) => {
+    const andCondition: AvailabilitySlotWhereInput[] = [];
+    if (search) {
+        andCondition.push({
+            OR: [
+                {
+                    tutor: {
+                        user: {
+                            name: { contains: search, mode: "insensitive" },
+                        },
+                    },
+                },
+                {
+                    tutor: {
+                        tutorSubjects: {
+                            some: {
+                                subjects: {
+                                    name: {
+                                        contains: search,
+                                        mode: "insensitive",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            ],
+        });
+    }
+
+    const result = await prisma.availabilitySlot.findMany({
+        take: limit,
+        skip,
+        where: {
+            AND: andCondition,
+        },
         include: {
             tutor: {
                 select: {
@@ -68,6 +107,20 @@ const getSlots = async () => {
             },
         },
     });
+    const total = await prisma.availabilitySlot.count({
+        where: {
+            AND: andCondition,
+        },
+    });
+    return {
+        slots: result,
+        meta: {
+            total,
+            page,
+            limit,
+            totalPage: Math.ceil(total / limit),
+        },
+    };
 };
 
 const getSlotById = async (slotId: string) => {
