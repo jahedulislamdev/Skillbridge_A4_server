@@ -17,7 +17,8 @@ model Tutor {
   reviews           Review[]           @relation("TutorReviews")
   booking           Booking[]          @relation("TutorBookings")
 
-  @@index([userId])
+  @@index([hourlyRate], name: "idx_tutor_hourlyRate")
+  @@index([status], name:"idx_tutor_bookingStatus")
   @@map("tutorsprofile")
 }
 

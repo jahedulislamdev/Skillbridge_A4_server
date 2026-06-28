@@ -13,7 +13,6 @@ model AvailabilitySlot {
 
   booking Booking?
 
-  @@index([tutorId])
   @@map("availableSlots")
 }
 

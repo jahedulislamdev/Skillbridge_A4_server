@@ -4,5 +4,6 @@ model subjects {
   name          String         @db.VarChar(50)
   tutorSubjects TutorSubject[]
 
+  @@index([name], name: "idx_sub_name")
   @@map("subjects")
 }

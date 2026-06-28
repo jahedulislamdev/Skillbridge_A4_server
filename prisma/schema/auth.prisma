@@ -17,6 +17,7 @@ model User {
   studentReviews Review[]  @relation("StudentReviews")
 
   @@unique([email])
+  @@index([name], name: "idx_user_name")
   @@map("user")
 }
 
